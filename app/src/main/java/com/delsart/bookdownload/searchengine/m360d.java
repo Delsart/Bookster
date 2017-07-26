@@ -65,7 +65,6 @@ public class m360d extends baseFragment {
                     else
                         page = 0;
                 } catch (Exception e) {
-                    //获取失败或加载完毕，开始获取owllook数据
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
                     message.sendToTarget();

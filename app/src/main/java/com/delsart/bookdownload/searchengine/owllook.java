@@ -79,8 +79,6 @@ public class owllook extends Fragment {
                     //迭代来加载下一页
 
                 } catch (Exception e) {
-                    //获取失败或加载完毕，开始获取owllook数据
-
                     e.printStackTrace();
                 }
 

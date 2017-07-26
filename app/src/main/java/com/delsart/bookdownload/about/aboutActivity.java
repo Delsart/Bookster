@@ -115,17 +115,16 @@ public class aboutActivity extends MaterialAboutActivity {
                     }
                 })
                 .build());
-        /*
+
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text("Fork on GitHub")
                 .icon(new IconicsDrawable(c)
                         .icon(CommunityMaterial.Icon.cmd_github_circle)
                         .color(ContextCompat.getColor(c, colorIcon))
                         .sizeDp(18))
-                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("")))
+                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("https://github.com/Delsart/Bookster")))
                 .build());
 
-*/
 
 
         MaterialAboutCard.Builder convenienceCardBuilder = new MaterialAboutCard.Builder();
