@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Bookster</string>
+    <string name="emptytext">请进行搜索</string>
+    <string name="firstlaunchshowtext">本软件只提供搜索服务，不储存任何网络资源。\n\n本软件完全免费，所有数据均来源网络，请勿用作非法用途，如果侵害了你的权益，请联系我尽快删除。\n\n如果可以，请点击来源网页中的广告来支持来源网站做下去</string>
+    <string name="title_activity_settings">设置</string>
+
+    <!-- Strings related to Settings -->
+
+
+</resources>

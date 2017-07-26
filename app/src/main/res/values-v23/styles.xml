@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#ffffff</item>
+        <item name="colorPrimaryDark">#eeeeee</item>
+        <item name="colorAccent">@color/accent_material_light</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#CCCCCC</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="settingTheme" parent="@android:style/Theme.Material.Light">
+        <item name="colorPrimary">#ffffff</item>
+        <item name="colorPrimaryDark">#eeeeee</item>
+        <item name="android:statusBarColor">#eeeeee</item>
+        <item name="colorAccent">@color/accent_material_light</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#CCCCCC</item>
+    </style>
+    <style name="aboutTheme" parent="Theme.Mal.Light.LightActionBar">
+        <item name="colorPrimary">#ffffff</item>
+        <item name="colorPrimaryDark">#eeeeee</item>
+        <item name="colorAccent">@color/accent_material_light</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#CCCCCC</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
