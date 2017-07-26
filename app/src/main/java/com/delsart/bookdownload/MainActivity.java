@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         if (firstime.getInt("first", 0) == 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("使用须知");
+            builder.setCancelable(false);
             builder.setMessage(R.string.firstlaunchshowtext);
             builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
                 @Override
