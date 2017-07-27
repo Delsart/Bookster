@@ -45,7 +45,6 @@ public class shuyuzhe extends baseFragment {
                         //统计数目
                         ii++;
                         //
-
                         String t = elements.get(i).attr("title").replace("Book.ShuYuZhe.com书语者_", "");
                         String name;
                         if (t.contains("-")) {
@@ -79,7 +78,7 @@ public class shuyuzhe extends baseFragment {
                     String info = "格式：" + form + "\n" + t2.substring(t2.indexOf("文件标签："), t2.indexOf("发布日期：") - 2) + "\n" + t2.substring(t2.indexOf("资源介绍："), t2.length());
                     String durl = element3.select("div.common_content_main").select("a:contains(下载此书)").attr("href");
                     Message message = showlist.obtainMessage();
-                    message.obj = new mlist(name, time, info, durl);
+                    message.obj = new mlist(name, time, info, durl,"");
                     message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();

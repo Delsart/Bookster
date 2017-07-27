@@ -10,9 +10,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +31,7 @@ import com.delsart.bookdownload.about.aboutActivity;
 import com.delsart.bookdownload.listandadapter.mpageAdapter;
 import com.delsart.bookdownload.searchengine.m360d;
 import com.delsart.bookdownload.searchengine.owllook;
+import com.delsart.bookdownload.searchengine.qilaiqi;
 import com.delsart.bookdownload.searchengine.shuyuzhe;
 import com.delsart.bookdownload.searchengine.xiaoshuwu;
 import com.delsart.bookdownload.searchengine.zhixuan;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private shuyuzhe shuyuzhe;
     private m360d m360d;
     private xiaoshuwu xiaoshuwu;
+    private qilaiqi qilaiqi;
     SharedPreferences firstime;
     SharedPreferences.Editor editor;
     mpageAdapter pageadapter = null;
@@ -180,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     String version = jsonObject.getString("version");
                     String info = jsonObject.getString("info");
                     String time = jsonObject.getString("time");
+                    String size = jsonObject.getString("size");
                     final String url = jsonObject.getString("url");
                     PackageManager manager;
 
@@ -193,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d("sss", "run: " + version+gettrueversion(version)+ "ssssss"+gettrueversion(infos.versionName));
                     if (gettrueversion(version) > gettrueversion(infos.versionName)) {
-                        showupdate(version, time, info, url);
+                        showupdate(version, time,size, info, url);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -215,13 +221,13 @@ public class MainActivity extends AppCompatActivity {
         return Float.parseFloat(s2);
     }
 
-    public void showupdate(final String version, final String time, final String info, final String url) {
+    public void showupdate(final String version, final String time,final String size, final String info, final String url) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("有新版本");
-                builder.setMessage("版本号：" + version + "\n更新时间：" + time + "\n更新日志：" + info);
+                builder.setMessage("版本号：" + version + "\n更新时间：" + time + "\nApk大小：" + size+"MB\n更新日志：" + info);
                 builder.setNegativeButton("取消", null);
                 builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     @Override
@@ -252,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
         shuyuzhe = new shuyuzhe();
         m360d = new m360d();
         xiaoshuwu=new xiaoshuwu();
+        qilaiqi=new qilaiqi();
+
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -262,9 +270,17 @@ public class MainActivity extends AppCompatActivity {
         pageadapter.addFragment(m360d, "360℃");
         pageadapter.addFragment(xiaoshuwu, "我的小书屋");
         pageadapter.addFragment(shuyuzhe, "书语者");
+        //pageadapter.addFragment(qilaiqi, "奇来奇");
        // pageadapter.addFragment(owllook, "owllook");
 
         viewPager.setAdapter(pageadapter);
+
+        viewPager.addOnAdapterChangeListener(new ViewPager.OnAdapterChangeListener() {
+            @Override
+            public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
+                searchView.clearFocus();
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -286,6 +302,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
                         shuyuzhe.totop();
+                        break;
+                    case 5:
+                        qilaiqi.totop();
                         break;
                 }
 
@@ -336,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     m360d.get("http://www.360dxs.com/list.html?keyword=" + toUtf8(query));
                     shuyuzhe.get("https://book.shuyuzhe.com/search/" + toUtf8(query));
                     xiaoshuwu.get("http://mebook.cc/?s="+toUtf8(query));
+                    //qilaiqi.get("http://m.laiqi.net/wap.php?action=search",toUtf8(query));
                     // owllook.getowllook("http://www.zxcs8.com/?keyword=" + toUtf8(query));
 
                 } catch (Exception e) {

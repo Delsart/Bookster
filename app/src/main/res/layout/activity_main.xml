@@ -30,16 +30,19 @@
             app:tabIndicatorColor="@color/accent_material_light"
             app:tabSelectedTextColor="@color/accent_material_light"
             app:tabMode="scrollable"
-            app:tabMinWidth="90dp"
+            app:tabMinWidth="75dp"
             app:layout_scrollFlags="scroll|enterAlways"
             android:layout_height="wrap_content" />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.view.ViewPager
+    <com.github.ybq.parallaxviewpager.ParallaxViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:mode="right_overlay"
+        app:outset="15%"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:shadow_width="6dp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

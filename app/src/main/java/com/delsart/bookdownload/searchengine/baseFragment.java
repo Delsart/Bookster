@@ -3,6 +3,9 @@ package com.delsart.bookdownload.searchengine;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,15 +15,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.delsart.bookdownload.R;
 import com.delsart.bookdownload.listandadapter.mListAdapter;
 import com.delsart.bookdownload.listandadapter.mlist;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -61,13 +71,7 @@ public class baseFragment extends Fragment {
         }
     };
 
-    public boolean getifnextpage() {
-        return loadmore.length() > 5;
-    }
 
-    public String getloadmore() {
-        return loadmore;
-    }
 
 
     public void totop() {
@@ -83,28 +87,8 @@ public class baseFragment extends Fragment {
     }
 
     public baseFragment() {
-
         adapter = new mListAdapter();
-        adapter.addData(list);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                //点击事件
-                try {
-                    waitingDialog.setTitle("下载");
-                    waitingDialog.setMessage("获取中...");
-                    waitingDialog.setIndeterminate(true);
-                    waitingDialog.setCancelable(false);
-                    waitingDialog.show();
-                    clickdurl = list.get(position).getdurl();
-                    downloadclick();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
     }
 
 
@@ -149,6 +133,22 @@ public class baseFragment extends Fragment {
         }
 
     };
+    Handler showdownloadh = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            waitingDialog.cancel();
+            try {
+                Uri uri = Uri.parse(msg.obj.toString());
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }
+    };
+
 
     public void getpage(final String url) throws Exception {
          /*
@@ -172,9 +172,6 @@ public class baseFragment extends Fragment {
         }
     }
 
-    public String getClickdurl() {
-        return clickdurl;
-    }
 
     public void downloadclick() throws Exception {
         try {
@@ -192,40 +189,70 @@ public class baseFragment extends Fragment {
         message.sendToTarget();
     }
 
-     Handler showdownloadh = new Handler() {
+
+    public boolean getifnextpage() {
+        return loadmore.length() > 5;
+    }
+
+    public String getloadmore() {
+        return loadmore;
+    }
+    Handler showpic = new Handler() {
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            waitingDialog.cancel();
-            try {
-                Uri uri = Uri.parse(msg.obj.toString());
-                startActivity(new Intent(Intent.ACTION_VIEW, uri));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
+            pic.setImageBitmap((Bitmap)msg.obj);
         }
+
     };
+    public void showpic(final String picurl) throws Exception {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Log.d("ssss", "run: "+picurl);
+                    HttpURLConnection conn=(HttpURLConnection)new URL(picurl).openConnection();
+                    conn.setConnectTimeout(6000);
+                    conn.setDoInput(true);
+                    InputStream is = conn.getInputStream();
+
+                    Bitmap bitmap =BitmapFactory.decodeStream(is);
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    Matrix matrix = new Matrix();
+                    matrix.postScale(2f, 2f);
+                    Message message = showpic.obtainMessage();
+                    message.obj = Bitmap.createBitmap(bitmap, 0, 0, width, height,
+                            matrix, true);
+                    message.sendToTarget();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
 
 
+    ImageView pic;
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
 
         View view = inflater.inflate(R.layout.list, container, false);
 
-        nosearchview = getLayoutInflater(savedInstanceState).inflate(R.layout.nosearch, container, false);
-        nofoundview = getLayoutInflater(savedInstanceState).inflate(R.layout.nofound, container, false);
-        searching = getLayoutInflater(savedInstanceState).inflate(R.layout.searching, container, false);
+        nosearchview = inflater.inflate(R.layout.nosearch, container, false);
+        nofoundview = inflater.inflate(R.layout.nofound, container, false);
+        searching =inflater.inflate(R.layout.searching, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         waitingDialog = new ProgressDialog(this.getActivity());
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         adapter = new mListAdapter();
         adapter.addData(list);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
@@ -234,8 +261,24 @@ public class baseFragment extends Fragment {
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 //点击事件
                 clickdurl = list.get(position).getdurl();
-                builder.setTitle("选择操作");
-                builder.setMessage(list.get(position).getname());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("查看");
+                View contentview = inflater.inflate(R.layout.mdialog, null);
+                LinearLayout linearLayout=(LinearLayout) contentview.findViewById(R.id.droot);
+                 pic =(ImageView)linearLayout.getChildAt(1);
+                TextView name =(TextView)linearLayout.getChildAt(0);
+                TextView time=  (TextView)linearLayout.getChildAt(2);
+                TextView info= (TextView)linearLayout.getChildAt(3);
+                name.setText(list.get(position).getname());
+                time.setText(list.get(position).gettime());
+                info.setText(list.get(position).getinfo().replace("\n\n","\n"));
+                try {
+                    showpic(list.get(position).getpic());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                builder.setView(contentview);
                 builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

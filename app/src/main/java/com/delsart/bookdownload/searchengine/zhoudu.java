@@ -69,8 +69,9 @@ public zhoudu(){
                     String time = t.substring(t.indexOf("分类："), t.indexOf("豆瓣评分："));
                     String info = t.substring(t.indexOf("简介："), t.length());
                     String durl = doc2.select("a[href].downloads").attr("href");
+                    String pic ="http://www.ireadweek.com" +doc2.select("div.hanghang-shu-content-img").select("img").attr("src");
                     Message message = showlist.obtainMessage();
-                    message.obj = new mlist(name, time, info, durl);
+                    message.obj = new mlist(name, time, info, durl,pic);
                     message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();

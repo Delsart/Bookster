@@ -7,8 +7,8 @@ android {
         applicationId "com.delsart.bookdownload"
         minSdkVersion 22
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.0 Beta-5"
+        versionCode 6
+        versionName "1.0 Beta-6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -32,6 +32,6 @@ dependencies {
     compile 'com.mikepenz:community-material-typeface:1.7.22.1@aar'
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22'
     compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.ms-square:expandableTextView:0.1.4'
+    compile 'com.github.ybq:parallaxviewpager:2.0.0'
     testCompile 'junit:junit:4.12'
 }

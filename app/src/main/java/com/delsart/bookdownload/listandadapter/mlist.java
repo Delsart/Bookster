@@ -5,11 +5,13 @@ public class mlist  {
 	private String time;
 	private String info;
 	private String durl;
-	public mlist(String name, String time, String info, String durl){
+	private String pic;
+	public mlist(String name, String time, String info, String durl,String pic){
 		this.name=name;
 		this.time=time;
 		this.info=info;
 		this.durl=durl;
+		this.pic=pic;
 	}
 	public String getname(){
 		return name;
@@ -22,5 +24,8 @@ public class mlist  {
 	}
 	public String getdurl(){
 		return durl;
+	}
+	public String getpic(){
+		return pic;
 	}
 }

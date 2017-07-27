@@ -73,7 +73,7 @@ public class owllook extends Fragment {
                         String info = elements.get(i).select("p").text().replace("　", "\n").replace("   ", "\n").replace("\n\n", "\n").replace("\n", "\n\n");
                         String durl = elements.get(i).select("a[href]").attr("href");
                         Message message = showlist.obtainMessage();
-                        message.obj = new mlist(name, time, info, durl);
+                        message.obj = new mlist(name, time, info, durl,"");
                         message.sendToTarget();
                     }
                     //迭代来加载下一页

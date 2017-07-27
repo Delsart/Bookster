@@ -58,7 +58,7 @@ public class uesdOpenSource extends aboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_book)
                         .color(ContextCompat.getColor(c, colorIcon))
                         .sizeDp(18),
-                "ExpandableTextView ", "2014", "Manabu Shimobe ",
+                "ParallaxViewPager ", "2015", "ybq",
                 OpenSourceLicense.APACHE_2);
 
         return new MaterialAboutList(materialAboutLIbraryLicenseCard,
