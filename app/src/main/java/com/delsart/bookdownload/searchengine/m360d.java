@@ -2,7 +2,6 @@ package com.delsart.bookdownload.searchengine;
 
 
 import android.os.Message;
-import android.util.Log;
 
 import com.delsart.bookdownload.listandadapter.mlist;
 
@@ -20,13 +19,12 @@ public class m360d extends baseFragment {
 
     public m360d() {
         super();
-        Log.d("a", "m360d: ");
     }
 
     public void get(String url) throws Exception {
         clean();
-        this.url = url;
         getpage(url);
+        this.url = url;
     }
 
     @Override
@@ -43,6 +41,7 @@ public class m360d extends baseFragment {
             public void run() {
                 try {
                     setsearchingpage();
+
                     Document doc = Jsoup.connect(url).data("page", "" + page).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
                     //分析得到数据
                     Elements elements = doc.select("div[itemtype=http://schema.org/Novel].am-thumbnail");
@@ -55,7 +54,7 @@ public class m360d extends baseFragment {
                         String info = elements.get(i).select("div[itemprop=description]").text();
                         String durl = elements.get(i).select("a[itemprop=name]").attr("href");
                         String pic ="http://www.360dxs.com/static/books/logo/"+durl.substring(durl.indexOf("_")+1,durl.indexOf(".html"))+"s.jpg";
-                        Message message = showlist.obtainMessage();
+                        Message message = addlist.obtainMessage();
                         message.obj = new mlist(name, time, info, durl,pic);
                         message.sendToTarget();
                     }
@@ -65,6 +64,8 @@ public class m360d extends baseFragment {
                         page++;
                     else
                         page = 0;
+                    Message message = showlist.obtainMessage();
+                    message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
@@ -99,6 +100,7 @@ public class m360d extends baseFragment {
                 super.run();
                 try {
                     //获得下载地址
+
                     Document download = Jsoup.connect("http:" + url).data("query", "Java").userAgent("Mozilla").get();
                     download = Jsoup.connect(download.select("a:contains(全文下载)").attr("href")).get();
                     String durl = "http:" + download.select("a:contains(简体TXT (UTF8编码))").attr("href");

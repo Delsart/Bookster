@@ -8,16 +8,15 @@
     <ImageView
         android:layout_marginTop="-140dp"
         android:id="@+id/imageView"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="150dp"
         app:srcCompat="@mipmap/nofound" />
 
     <TextView
         android:id="@+id/textView"
         android:padding="16dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="没有找到，请尝试其他来源"
-        android:layout_gravity="center"/>
+        android:text="没有找到，请尝试其他来源" />
 </LinearLayout>

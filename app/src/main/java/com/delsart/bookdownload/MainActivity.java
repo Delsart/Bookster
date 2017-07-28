@@ -2,6 +2,8 @@ package com.delsart.bookdownload;
 
 
 import android.app.Activity;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,18 +12,17 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,10 +31,9 @@ import android.view.Window;
 import com.delsart.bookdownload.about.aboutActivity;
 import com.delsart.bookdownload.listandadapter.mpageAdapter;
 import com.delsart.bookdownload.searchengine.m360d;
-import com.delsart.bookdownload.searchengine.owllook;
-import com.delsart.bookdownload.searchengine.qilaiqi;
 import com.delsart.bookdownload.searchengine.shuyuzhe;
 import com.delsart.bookdownload.searchengine.xiaoshuwu;
+import com.delsart.bookdownload.searchengine.qishu;
 import com.delsart.bookdownload.searchengine.zhixuan;
 import com.delsart.bookdownload.searchengine.zhoudu;
 
@@ -50,12 +50,13 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     private com.delsart.bookdownload.searchengine.zhixuan zhixuan;
-    private com.delsart.bookdownload.searchengine.owllook owllook;
     private com.delsart.bookdownload.searchengine.zhoudu zhoudu;
     private shuyuzhe shuyuzhe;
     private m360d m360d;
     private xiaoshuwu xiaoshuwu;
-    private qilaiqi qilaiqi;
+    private qishu qishu;
+
+
     SharedPreferences firstime;
     SharedPreferences.Editor editor;
     mpageAdapter pageadapter = null;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean MIUISetStatusBarLightMode(Activity activity, boolean dark) {
         boolean result = false;
-        Window window=activity.getWindow();
+        Window window = activity.getWindow();
         if (window != null) {
             Class clazz = window.getClass();
             try {
@@ -76,22 +77,22 @@ public class MainActivity extends AppCompatActivity {
                 Field field = layoutParams.getField("EXTRA_FLAG_STATUS_BAR_DARK_MODE");
                 darkModeFlag = field.getInt(layoutParams);
                 Method extraFlagField = clazz.getMethod("setExtraFlags", int.class, int.class);
-                if(dark){
-                    extraFlagField.invoke(window,darkModeFlag,darkModeFlag);//状态栏透明且黑色字体
-                }else{
+                if (dark) {
+                    extraFlagField.invoke(window, darkModeFlag, darkModeFlag);//状态栏透明且黑色字体
+                } else {
                     extraFlagField.invoke(window, 0, darkModeFlag);//清除黑色字体
                 }
-                result=true;
+                result = true;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //开发版 7.7.13 及以后版本采用了系统API，旧方法无效但不会报错，所以两个方式都要加上
-                    if(dark){
-                        activity.getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN| View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                    }else {
+                    if (dark) {
+                        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    } else {
                         activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
         }
@@ -103,12 +104,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MIUISetStatusBarLightMode(this,true);
+        MIUISetStatusBarLightMode(this, true);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         initview();
         firstime = getSharedPreferences("data", MODE_PRIVATE);
+        editor = firstime.edit();
         if (firstime.getInt("first", 0) == 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("使用须知");
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    editor = firstime.edit();
+
                     editor.putInt("first", 1);
                     editor.apply();
                 }
@@ -131,7 +133,45 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         }
 
-         autoupdate = getSharedPreferences("com.delsart.bookdownload_preferences", MODE_PRIVATE);
+        if (firstime.getInt("showrate", 1) > 3 && firstime.getBoolean("ifshowrate", true)) {
+            editor.putInt("showrate", 1);
+            editor.apply();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("嗨，还好吗？");
+            builder.setMessage(R.string.showrate);
+            builder.setNegativeButton("评分", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Uri uri = Uri.parse("market://details?id=" + getPackageName());
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            });
+            builder.setPositiveButton("捐赠", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ClipboardManager cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    cmb.setText("15874082586");
+                    Snackbar.make(findViewById(R.id.main_content), "支付宝账号已复制", Snackbar.LENGTH_SHORT).show();
+
+                }
+            });
+            builder.setNeutralButton("拒绝，并不再提醒", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    editor.putBoolean("ifshowrate", false);
+                    editor.apply();
+                }
+            });
+            builder.show();
+        } else {
+
+            editor.putInt("showrate", firstime.getInt("showrate", 1) + 1);
+            editor.apply();
+        }
+
+        autoupdate = getSharedPreferences("com.delsart.bookdownload_preferences", MODE_PRIVATE);
         if (autoupdate.getBoolean("autoUpdate", true)) {
 
             try {
@@ -197,9 +237,9 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    Log.d("sss", "run: " + version+gettrueversion(version)+ "ssssss"+gettrueversion(infos.versionName));
+                    Log.d("sss", "run: " + version + gettrueversion(version) + "ssssss" + gettrueversion(infos.versionName));
                     if (gettrueversion(version) > gettrueversion(infos.versionName)) {
-                        showupdate(version, time,size, info, url);
+                        showupdate(version, time, size, info, url);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -212,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         String s2 = "";
         for (char a : s.toCharArray()) {
 
-            if ("0123456789.".indexOf(a)>=0) {
+            if ("0123456789.".indexOf(a) >= 0) {
                 s2 = s2 + a;
 
             }
@@ -221,13 +261,13 @@ public class MainActivity extends AppCompatActivity {
         return Float.parseFloat(s2);
     }
 
-    public void showupdate(final String version, final String time,final String size, final String info, final String url) {
+    public void showupdate(final String version, final String time, final String size, final String info, final String url) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("有新版本");
-                builder.setMessage("版本号：" + version + "\n更新时间：" + time + "\nApk大小：" + size+"MB\n更新日志：" + info);
+                builder.setMessage("版本号：" + version + "\n更新时间：" + time + "\nApk大小：" + size + "MB\n更新日志：" + info);
                 builder.setNegativeButton("取消", null);
                 builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     @Override
@@ -239,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNeutralButton("关闭自动检查", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        SharedPreferences.Editor editor=autoupdate.edit();
+                        SharedPreferences.Editor editor = autoupdate.edit();
                         editor.putBoolean("autoUpdate", false);
                         editor.apply();
                     }
@@ -253,15 +293,15 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(null);
 
         zhixuan = new zhixuan();
-        owllook = new owllook();
         zhoudu = new zhoudu();
         shuyuzhe = new shuyuzhe();
         m360d = new m360d();
-        xiaoshuwu=new xiaoshuwu();
-        qilaiqi=new qilaiqi();
+        xiaoshuwu = new xiaoshuwu();
+qishu=new qishu();
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         pageadapter = new mpageAdapter(getSupportFragmentManager());
@@ -270,17 +310,10 @@ public class MainActivity extends AppCompatActivity {
         pageadapter.addFragment(m360d, "360℃");
         pageadapter.addFragment(xiaoshuwu, "我的小书屋");
         pageadapter.addFragment(shuyuzhe, "书语者");
-        //pageadapter.addFragment(qilaiqi, "奇来奇");
-       // pageadapter.addFragment(owllook, "owllook");
+        pageadapter.addFragment(qishu, "奇书");
+
 
         viewPager.setAdapter(pageadapter);
-
-        viewPager.addOnAdapterChangeListener(new ViewPager.OnAdapterChangeListener() {
-            @Override
-            public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter oldAdapter, @Nullable PagerAdapter newAdapter) {
-                searchView.clearFocus();
-            }
-        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -304,13 +337,12 @@ public class MainActivity extends AppCompatActivity {
                         shuyuzhe.totop();
                         break;
                     case 5:
-                        qilaiqi.totop();
+                        qishu.totop();
                         break;
                 }
-
             }
         });
-
+        viewPager.setLayerType(View.LAYER_TYPE_NONE,null);
     }
 
     @Override
@@ -347,16 +379,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //处理搜索结果
-                zhixuan.clean();
                 try {
-                    searchView.clearFocus();
+                    viewPager.setLayerType(View.LAYER_TYPE_HARDWARE,null);
+                    Runtime runtime = Runtime.getRuntime();
+                    runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);
+                    runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);
+                    getSupportActionBar().setTitle("搜索：" + query);
                     zhixuan.get("http://www.zxcs8.com/?keyword=" + toUtf8(query));
                     zhoudu.get("http://www.ireadweek.com/index.php/Index/bookList.html?keyword=" + toUtf8(query));
                     m360d.get("http://www.360dxs.com/list.html?keyword=" + toUtf8(query));
                     shuyuzhe.get("https://book.shuyuzhe.com/search/" + toUtf8(query));
-                    xiaoshuwu.get("http://mebook.cc/?s="+toUtf8(query));
-                    //qilaiqi.get("http://m.laiqi.net/wap.php?action=search",toUtf8(query));
-                    // owllook.getowllook("http://www.zxcs8.com/?keyword=" + toUtf8(query));
+                    xiaoshuwu.get("http://mebook.cc/?s=" + toUtf8(query));
+                    qishu.get("http://zhannei.baidu.com/cse/search?s=2672242722776283010&q="+toUtf8(query));
+
+                    viewPager.setLayerType(View.LAYER_TYPE_NONE,null);
 
                 } catch (Exception e) {
                     e.printStackTrace();

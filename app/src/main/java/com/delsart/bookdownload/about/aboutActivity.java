@@ -41,7 +41,7 @@ public class aboutActivity extends MaterialAboutActivity {
     @NonNull
     @Override
     protected MaterialAboutList getMaterialAboutList(final Context c) {
-
+        getSupportActionBar().setElevation(8);
         MaterialAboutCard.Builder appCardBuilder = new MaterialAboutCard.Builder();
         // Add items to card
 
@@ -224,6 +224,14 @@ public class aboutActivity extends MaterialAboutActivity {
                 "我的小书屋",
                 true,
                 Uri.parse("http://mebook.cc")));
+        otherCardBuilder.addItem(ConvenienceBuilder.createWebsiteActionItem(c,
+                new IconicsDrawable(c)
+                        .icon(CommunityMaterial.Icon.cmd_earth)
+                        .color(ContextCompat.getColor(c, colorIcon))
+                        .sizeDp(18),
+                "奇书网",
+                true,
+                Uri.parse("http://www.qisuu.com")));
 
         return new MaterialAboutList(appCardBuilder.build(), authorCardBuilder.build(), convenienceCardBuilder.build(),otherCardBuilder.build());
     }

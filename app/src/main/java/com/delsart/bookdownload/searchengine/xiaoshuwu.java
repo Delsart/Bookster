@@ -22,9 +22,8 @@ public class xiaoshuwu extends baseFragment {
 
     public xiaoshuwu() {
         super();
-
-
     }
+
 
     public void get(String url) throws Exception {
         clean();
@@ -73,6 +72,8 @@ public class xiaoshuwu extends baseFragment {
                     getnext(name,time,elements.get(i).select("div.img").select("a").attr("href"),pic);
                     }
                     ifnopage();
+                    Message message = showlist.obtainMessage();
+                    message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
@@ -91,7 +92,7 @@ public class xiaoshuwu extends baseFragment {
                     Document doc2 = Jsoup.connect(url).timeout(10000).data("query", "Java").userAgent("Mozilla").get();
                     Elements element3 = doc2.select("div#content");
                     String info =element3.text().substring(0,element3.text().indexOf("下载地址"));
-                    Message message = showlist.obtainMessage();
+                    Message message = addlist.obtainMessage();
                     String durl=element3.select("a:containsOwn(点击下载)").attr("href");
                      message.obj = new mlist(name, time, info, durl,pic);
                     message.sendToTarget();

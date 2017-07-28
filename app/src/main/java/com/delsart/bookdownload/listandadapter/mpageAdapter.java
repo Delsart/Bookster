@@ -3,6 +3,7 @@ package com.delsart.bookdownload.listandadapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,22 +20,14 @@ public class mpageAdapter extends FragmentPagerAdapter {
     }
 
 
-    public void clean(){
-        mFragments.clear();
-        mFragmentTitles.clear();
-    }
-    public void remove(int position) {
-        mFragments.remove(position);
-        mFragmentTitles.remove(position);
-notifyDataSetChanged();
-
-    }
-
-
     public void addFragment(Fragment fragment, String title) {
         mFragments.add(fragment);
         mFragmentTitles.add(title);
-notifyDataSetChanged();
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+
     }
 
     @Override

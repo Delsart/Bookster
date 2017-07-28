@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="transparent">#00000000</color>
+    <color name="maincolor">@color/accent_material_light</color>
         <color name="blue_500">#2196F3</color>
         <color name="titlefont">#ffffff</color>
         <color name="indigo">#3F51B5</color>

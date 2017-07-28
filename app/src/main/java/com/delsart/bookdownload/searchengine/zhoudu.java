@@ -2,7 +2,6 @@ package com.delsart.bookdownload.searchengine;
 
 
 import android.os.Message;
-import android.util.Log;
 
 import com.delsart.bookdownload.listandadapter.mlist;
 
@@ -16,11 +15,10 @@ import org.jsoup.select.Elements;
  */
 
 public class zhoudu extends baseFragment {
-public zhoudu(){
-    super();
-    Log.d("a", "zhoudu: ");
+    public zhoudu() {
+        super();
+    }
 
-}
     public void get(String url) throws Exception {
         clean();
         getpage(url);
@@ -48,6 +46,8 @@ public zhoudu(){
                     }
                     ifnopage();
                     //判断为空
+                    Message message = showlist.obtainMessage();
+                    message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
@@ -70,7 +70,7 @@ public zhoudu(){
                     String info = t.substring(t.indexOf("简介："), t.length());
                     String durl = doc2.select("a[href].downloads").attr("href");
                     String pic ="http://www.ireadweek.com" +doc2.select("div.hanghang-shu-content-img").select("img").attr("src");
-                    Message message = showlist.obtainMessage();
+                    Message message = addlist.obtainMessage();
                     message.obj = new mlist(name, time, info, durl,pic);
                     message.sendToTarget();
                 } catch (Exception e) {

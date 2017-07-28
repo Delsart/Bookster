@@ -2,7 +2,6 @@ package com.delsart.bookdownload.searchengine;
 
 
 import android.os.Message;
-import android.util.Log;
 
 import com.delsart.bookdownload.listandadapter.mlist;
 
@@ -16,9 +15,9 @@ import org.jsoup.select.Elements;
 
 public class shuyuzhe extends baseFragment {
 
+
     public shuyuzhe() {
-       super();
-        Log.d("a", "shuyuzhe: ");
+        super();
     }
 
     public void get(String url) throws Exception {
@@ -55,6 +54,8 @@ public class shuyuzhe extends baseFragment {
                         getnext(elements.get(i).attr("href"), name, t.substring(t.indexOf("."), t.length()));
                     }
                     ifnopage();
+                    Message message = showlist.obtainMessage();
+                    message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
@@ -77,7 +78,7 @@ public class shuyuzhe extends baseFragment {
                     String time = t2.substring(t2.indexOf("发布日期："), t2.indexOf("资源介绍："));
                     String info = "格式：" + form + "\n" + t2.substring(t2.indexOf("文件标签："), t2.indexOf("发布日期：") - 2) + "\n" + t2.substring(t2.indexOf("资源介绍："), t2.length());
                     String durl = element3.select("div.common_content_main").select("a:contains(下载此书)").attr("href");
-                    Message message = showlist.obtainMessage();
+                    Message message = addlist.obtainMessage();
                     message.obj = new mlist(name, time, info, durl,"");
                     message.sendToTarget();
                 } catch (Exception e) {

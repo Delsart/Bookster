@@ -2,7 +2,6 @@ package com.delsart.bookdownload.searchengine;
 
 
 import android.os.Message;
-import android.util.Log;
 
 import com.delsart.bookdownload.listandadapter.mlist;
 
@@ -15,10 +14,10 @@ import org.jsoup.select.Elements;
  */
 
 public class zhixuan extends baseFragment {
-    public zhixuan() {
-        super();
-        Log.d("a", "zhixuan: ");
 
+
+    public zhixuan( ) {
+        super();
     }
 
     public void get(String url) throws Exception {
@@ -51,6 +50,8 @@ public class zhixuan extends baseFragment {
                         getnext(elements.get(i).select("a[href]").attr("href"),name,time,info);
                     }
                     ifnopage();
+                    Message message = showlist.obtainMessage();
+                    message.sendToTarget();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Message message = failload.obtainMessage();
@@ -69,7 +70,7 @@ public class zhixuan extends baseFragment {
                     Document download = Jsoup.connect(url).data("query", "Java").get();
                     String durl = download.select("div.down_2").select("a[href]").attr("href");
                     String pic=download.select("img[title=点击查看原图]").attr("src");
-                    Message message = showlist.obtainMessage();
+                    Message message = addlist.obtainMessage();
                     message.obj = new mlist(name, time, info, durl,pic);
                     message.sendToTarget();
                 } catch (Exception e) {

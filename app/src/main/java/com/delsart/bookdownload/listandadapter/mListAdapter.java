@@ -12,9 +12,13 @@ public class mListAdapter extends BaseQuickAdapter<mlist,BaseViewHolder>
 
      @Override
      protected void convert(BaseViewHolder viewHolder, mlist item) {
+         String s=item.getinfo();
+         if (s.length()>200){
+             s=s.substring(0,200)+"   >>点击查看更多";
+         }
          viewHolder.setText(R.id.name, item.getname())
                  .setText(R.id.time, item.gettime())
-                 .setText(R.id.info,item.getinfo());
+                 .setText(R.id.info,s);
 
      }
 

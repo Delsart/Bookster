@@ -52,8 +52,10 @@ public class baseFragment extends Fragment {
     View nosearchview;
     View nofoundview;
     View searching;
+    View recyclerview;
+    View view;
     int ii = 0;
-
+    ImageView pic;
 
     BaseQuickAdapter.RequestLoadMoreListener lml = new BaseQuickAdapter.RequestLoadMoreListener() {
         @Override
@@ -65,12 +67,10 @@ public class baseFragment extends Fragment {
                     adapter.loadMoreEnd();
             } catch (Exception e) {
                 e.printStackTrace();
-                adapter.loadMoreFail();
             }
 
         }
     };
-
 
 
 
@@ -89,18 +89,26 @@ public class baseFragment extends Fragment {
     public baseFragment() {
         adapter = new mListAdapter();
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
+        adapter.setOnLoadMoreListener(lml, recyclerView);
     }
 
 
 
 
-    Handler showlist = new Handler() {
+    Handler addlist = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             adapter.addData((mlist) msg.obj);
             list.add((mlist) msg.obj);
+        }
+
+    };
+    Handler showlist = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
             adapter.loadMoreComplete();
         }
 
@@ -110,7 +118,6 @@ public class baseFragment extends Fragment {
 
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
             adapter.loadMoreFail();
         }
 
@@ -119,7 +126,6 @@ public class baseFragment extends Fragment {
 
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
             adapter.setEmptyView(nofoundview);
         }
 
@@ -128,7 +134,6 @@ public class baseFragment extends Fragment {
 
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
             adapter.setEmptyView(searching);
         }
 
@@ -136,7 +141,6 @@ public class baseFragment extends Fragment {
     Handler showdownloadh = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
             waitingDialog.cancel();
             try {
                 Uri uri = Uri.parse(msg.obj.toString());
@@ -236,7 +240,7 @@ public class baseFragment extends Fragment {
     }
 
 
-    ImageView pic;
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater,
@@ -244,18 +248,30 @@ public class baseFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
 
-        View view = inflater.inflate(R.layout.list, container, false);
+        view = inflater.inflate(R.layout.list, null, false);
+        Log.d("sssss", "onCreateView: ");
+        nosearchview =inflater.inflate(R.layout.nosearch, null, false);
+        nofoundview = inflater.inflate(R.layout.nofound, null, false);
+        searching =inflater.inflate(R.layout.searching, null, false);
 
-        nosearchview = inflater.inflate(R.layout.nosearch, container, false);
-        nofoundview = inflater.inflate(R.layout.nofound, container, false);
-        searching =inflater.inflate(R.layout.searching, container, false);
-
+        waitingDialog = new ProgressDialog(getContext());
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        waitingDialog = new ProgressDialog(this.getActivity());
-        adapter = new mListAdapter();
-        adapter.addData(list);
-        adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
+        recyclerView.setAdapter(adapter);
+
+        if (adapter.getEmptyView() != null) {
+            ViewGroup pare = (ViewGroup) adapter.getEmptyView().getParent();
+            if (pare != null)
+                pare.removeView(adapter.getEmptyView());
+        }
+        if (ifseadching)
+            adapter.setEmptyView(searching);
+        if (iffail)
+            adapter.setEmptyView(nofoundview);
+        else if (!ifseadching)
+            adapter.setEmptyView(nosearchview);
+
+
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -265,7 +281,7 @@ public class baseFragment extends Fragment {
                 builder.setTitle("查看");
                 View contentview = inflater.inflate(R.layout.mdialog, null);
                 LinearLayout linearLayout=(LinearLayout) contentview.findViewById(R.id.droot);
-                 pic =(ImageView)linearLayout.getChildAt(1);
+                pic =(ImageView)linearLayout.getChildAt(1);
                 TextView name =(TextView)linearLayout.getChildAt(0);
                 TextView time=  (TextView)linearLayout.getChildAt(2);
                 TextView info= (TextView)linearLayout.getChildAt(3);
@@ -277,7 +293,6 @@ public class baseFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 builder.setView(contentview);
                 builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     @Override
@@ -298,22 +313,6 @@ public class baseFragment extends Fragment {
                 builder.show();
             }
         });
-
-        recyclerView.setAdapter(adapter);
-        if (adapter.getEmptyView() != null) {
-            ViewGroup pare = (ViewGroup) adapter.getEmptyView().getParent();
-            if (pare != null)
-                pare.removeView(adapter.getEmptyView());
-        }
-        if (ifseadching)
-            adapter.setEmptyView(searching);
-        if (iffail)
-            adapter.setEmptyView(nofoundview);
-        else if (!ifseadching)
-            adapter.setEmptyView(nosearchview);
-
-        adapter.setOnLoadMoreListener(lml, recyclerView);
-
 
         return view;
     }
