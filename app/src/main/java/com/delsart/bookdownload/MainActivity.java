@@ -291,17 +291,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void initview() {
         getWindow().setBackgroundDrawable(null);
-
         zhixuan = new zhixuan();
         zhoudu = new zhoudu();
         shuyuzhe = new shuyuzhe();
         m360d = new m360d();
         xiaoshuwu = new xiaoshuwu();
-qishu=new qishu();
+        qishu = new qishu();
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setLayerType(View.LAYER_TYPE_HARDWARE,null);
+        viewPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         pageadapter = new mpageAdapter(getSupportFragmentManager());
@@ -342,7 +341,7 @@ qishu=new qishu();
                 }
             }
         });
-        viewPager.setLayerType(View.LAYER_TYPE_NONE,null);
+        viewPager.setLayerType(View.LAYER_TYPE_NONE, null);
     }
 
     @Override
@@ -380,7 +379,7 @@ qishu=new qishu();
             public boolean onQueryTextSubmit(String query) {
                 //处理搜索结果
                 try {
-                    viewPager.setLayerType(View.LAYER_TYPE_HARDWARE,null);
+                    viewPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                     Runtime runtime = Runtime.getRuntime();
                     runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);
                     runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);
@@ -390,9 +389,9 @@ qishu=new qishu();
                     m360d.get("http://www.360dxs.com/list.html?keyword=" + toUtf8(query));
                     shuyuzhe.get("https://book.shuyuzhe.com/search/" + toUtf8(query));
                     xiaoshuwu.get("http://mebook.cc/?s=" + toUtf8(query));
-                    qishu.get("http://zhannei.baidu.com/cse/search?s=2672242722776283010&q="+toUtf8(query));
+                    qishu.get("http://zhannei.baidu.com/cse/search?s=2672242722776283010&q=" + toUtf8(query));
 
-                    viewPager.setLayerType(View.LAYER_TYPE_NONE,null);
+                    viewPager.setLayerType(View.LAYER_TYPE_NONE, null);
 
                 } catch (Exception e) {
                     e.printStackTrace();

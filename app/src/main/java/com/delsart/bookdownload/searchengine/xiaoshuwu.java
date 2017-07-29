@@ -26,8 +26,7 @@ public class xiaoshuwu extends baseFragment {
 
 
     public void get(String url) throws Exception {
-        clean();
-        getpage(url);
+        super.get(url);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class xiaoshuwu extends baseFragment {
                 try {
                     setsearchingpage();
 
-                    Document doc = Jsoup.connect(url).timeout(10000).data("query", "Java").userAgent("Mozilla").get();
+                    Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36").timeout(10000).get();
                     //获得下一页数据
                     loadmore = "";
                     page++;
@@ -89,7 +88,7 @@ public class xiaoshuwu extends baseFragment {
             @Override
             public void run() {
                 try {
-                    Document doc2 = Jsoup.connect(url).timeout(10000).data("query", "Java").userAgent("Mozilla").get();
+                    Document doc2 = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36").timeout(10000).get();
                     Elements element3 = doc2.select("div#content");
                     String info =element3.text().substring(0,element3.text().indexOf("下载地址"));
                     Message message = addlist.obtainMessage();

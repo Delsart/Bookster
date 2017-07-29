@@ -7,8 +7,8 @@ android {
         applicationId "com.delsart.bookdownload"
         minSdkVersion 22
         targetSdkVersion 25
-        versionCode 7
-        versionName "1.0 Beta-7"
+        versionCode 10
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

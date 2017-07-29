@@ -22,9 +22,7 @@ public class m360d extends baseFragment {
     }
 
     public void get(String url) throws Exception {
-        clean();
-        getpage(url);
-        this.url = url;
+        super.get(url);
     }
 
     @Override
@@ -101,10 +99,14 @@ public class m360d extends baseFragment {
                 try {
                     //获得下载地址
 
-                    Document download = Jsoup.connect("http:" + url).data("query", "Java").userAgent("Mozilla").get();
+                    Document download = Jsoup.connect("http:" + url).timeout(10000).get();
+                    String durl2= download.select("a:contains(分卷下载)").attr("href");
                     download = Jsoup.connect(download.select("a:contains(全文下载)").attr("href")).get();
                     String durl = "http:" + download.select("a:contains(简体TXT (UTF8编码))").attr("href");
-                    showdownload(durl);
+                    String[] lis = new String[2];
+                    lis[0]=durl;
+                    lis[1]=durl2;
+                    showdownload(lis);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

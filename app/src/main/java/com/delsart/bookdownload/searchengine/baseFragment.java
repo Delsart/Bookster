@@ -44,16 +44,16 @@ public class baseFragment extends Fragment {
     ArrayList<mlist> list = new ArrayList<>();
     String loadmore = "";
     ProgressDialog waitingDialog;
-
+String url;
     String clickdurl;
 
+    boolean delayload=false;
     boolean iffail = false;
     boolean ifseadching = false;
     View nosearchview;
     View nofoundview;
     View searching;
-    View recyclerview;
-    View view;
+    View view=null;
     int ii = 0;
     ImageView pic;
 
@@ -72,7 +72,14 @@ public class baseFragment extends Fragment {
         }
     };
 
-
+public void get(String s) throws Exception {
+    url=s;
+    clean();
+    if (view!=null)
+        getpage(s);
+    else
+        delayload=true;
+}
 
     public void totop() {
         recyclerView.smoothScrollToPosition(0);
@@ -148,10 +155,7 @@ public class baseFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
-        }
-    };
+        } };
 
 
     public void getpage(final String url) throws Exception {
@@ -192,7 +196,34 @@ public class baseFragment extends Fragment {
         message.obj = string;
         message.sendToTarget();
     }
+    public void showdownload(String[] alist) {
+        Message message = showdownloadpro.obtainMessage();
+        message.obj = alist;
+        message.sendToTarget();
+    }
+    Handler showdownloadpro = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            waitingDialog.cancel();
+            try {
+                AlertDialog.Builder singleChoiceDialog =
+                        new AlertDialog.Builder(getActivity());
+                final String[] a= (String[]) msg.obj;
+                singleChoiceDialog.setTitle("选择下载对象");
+                singleChoiceDialog.setItems( a,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri = Uri.parse(a[which]);
+                                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                            }
+                        });
+                   singleChoiceDialog.show();
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } };
 
     public boolean getifnextpage() {
         return loadmore.length() > 5;
@@ -258,12 +289,8 @@ public class baseFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        recyclerView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
 
-        if (adapter.getEmptyView() != null) {
-            ViewGroup pare = (ViewGroup) adapter.getEmptyView().getParent();
-            if (pare != null)
-                pare.removeView(adapter.getEmptyView());
-        }
         if (ifseadching)
             adapter.setEmptyView(searching);
         if (iffail)
@@ -314,6 +341,12 @@ public class baseFragment extends Fragment {
             }
         });
 
+        if (delayload){
+            try {
+                getpage(url);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }}
         return view;
     }
 

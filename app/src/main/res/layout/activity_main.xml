@@ -5,7 +5,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+
     tools:context="com.delsart.bookdownload.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -21,6 +21,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll"
+
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
         </android.support.v7.widget.Toolbar>
@@ -40,9 +41,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:mode="left_overlay"
-        app:outset="15%"
+        app:outset="10%"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:shadow_width="5dp"/>
+        app:shadow_width="4dp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

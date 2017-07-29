@@ -21,8 +21,7 @@ public class zhixuan extends baseFragment {
     }
 
     public void get(String url) throws Exception {
-        clean();
-        getpage(url);
+        super.get(url);
     }
 
 

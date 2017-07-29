@@ -20,8 +20,7 @@ public class zhoudu extends baseFragment {
     }
 
     public void get(String url) throws Exception {
-        clean();
-        getpage(url);
+        super.get(url);
     }
 
     public void getpage(final String url) throws Exception {
