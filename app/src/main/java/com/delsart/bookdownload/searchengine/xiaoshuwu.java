@@ -40,45 +40,49 @@ public class xiaoshuwu extends baseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                setsearchingpage();
+                Document doc=null;
                 try {
-                    setsearchingpage();
-
-                    Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36").timeout(10000).get();
+                    doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36").timeout(10000).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message message = failload.obtainMessage();
+                    message.sendToTarget();
+                }
                     //获得下一页数据
+                if (doc!=null) {
                     loadmore = "";
                     page++;
-                    loadmore = doc.select("a[title*=页]:containsOwn("+page+")").attr("href");
+                    loadmore = doc.select("a[title*=页]:containsOwn(" + page + ")").attr("href");
                     //分析得到数据
                     Elements elements = doc.select("li:has(div.content)");
                     for (int i = 0; i < elements.size(); i++) {
                         //统计数目
                         ii++;
                         //
-                        String t= elements.get(i).select("div.content").select("a").attr("title");
-                        String t2= elements.get(i).select("div.info").text();
+                        String t = elements.get(i).select("div.content").select("a").attr("title");
+                        String t2 = elements.get(i).select("div.info").text();
                         String name;
                         String time;
-                        String pic=elements.get(i).select("div.img").select("img").attr("src");
+                        String pic = elements.get(i).select("div.img").select("img").attr("src");
                         if (t.contains("（")) {
-                             name= t.substring(0, t.lastIndexOf("（"));
-                          time = "收录时间：" + t2.substring(0, t2.indexOf(" ·")) + "\n格式：" + t.substring(t.lastIndexOf("）") + 1, t.length()) + "\n标签：" + elements.get(i).select("div.cat").text();
+                            name = t.substring(0, t.lastIndexOf("（"));
+                            time = "收录时间：" + t2.substring(0, t2.indexOf(" ·")) + "\n格式：" + t.substring(t.lastIndexOf("）") + 1, t.length()) + "\n标签：" + elements.get(i).select("div.cat").text();
+                        } else {
+                            name = t;
+                            time = "收录时间：" + t2.substring(0, t2.indexOf(" ·")) + "\n标签：" + elements.get(i).select("div.cat").text();
                         }
-                        else
-                        {
-                             name=t;
-                             time = "收录时间：" + t2.substring(0, t2.indexOf(" ·")) +"\n标签：" + elements.get(i).select("div.cat").text();
+                        try {
+                            getnext(name, time, elements.get(i).select("div.img").select("a").attr("href"), pic);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    getnext(name,time,elements.get(i).select("div.img").select("a").attr("href"),pic);
                     }
                     ifnopage();
                     Message message = showlist.obtainMessage();
                     message.sendToTarget();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message message = failload.obtainMessage();
-                    message.sendToTarget();
-                }
 
+                }
             }
         }).start();
     }

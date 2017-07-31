@@ -33,5 +33,6 @@ dependencies {
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.github.ybq:parallaxviewpager:2.0.0'
+    compile 'moe.feng:AlipayZeroSdk:1.1'
     testCompile 'junit:junit:4.12'
 }

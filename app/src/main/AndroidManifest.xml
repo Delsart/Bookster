@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:windowSoftInputMode="stateAlwaysHidden"
         android:theme="@style/AppTheme"
+        android:name=".mApplication"
         >
         <activity
             android:name=".MainActivity"

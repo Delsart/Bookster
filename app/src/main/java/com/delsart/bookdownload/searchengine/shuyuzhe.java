@@ -30,11 +30,17 @@ public class shuyuzhe extends baseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                setsearchingpage();
+                Document doc=null;
                 try {
-                    setsearchingpage();
-
                     //获得知轩藏书数据
-                    Document doc = Jsoup.connect(url).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                     doc = Jsoup.connect(url).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message message = failload.obtainMessage();
+                    message.sendToTarget();
+                }
+                if (doc!=null) {
                     //获得下一页数据
                     loadmore = "";
                     loadmore = doc.select("a[href]:contains(下一页)").attr("href");
@@ -46,28 +52,30 @@ public class shuyuzhe extends baseFragment {
                         //
                         String t = elements.get(i).attr("title").replace("Book.ShuYuZhe.com书语者_", "");
                         String name;
-                        if (t.contains("-")) {
-                            name = "《" + t.substring(0, t.indexOf("-")) + "》" + "作者：" + t.substring(t.indexOf("-") + 1, t.indexOf("."));
+
+                        try {
+                            if (t.contains("-")) {
+                            name =  t.substring(0, t.indexOf("-"));
+                                    getnext(elements.get(i).attr("href"), name, t.substring(t.indexOf("."), t.length()),"作者：" + t.substring(t.indexOf("-") + 1, t.indexOf("."))+"\n");
                         } else {
-                            name = "《" + t.substring(0, t.indexOf(".")) + "》";
+                            name = t.substring(0, t.indexOf(".")) ;
+                            getnext(elements.get(i).attr("href"), name, t.substring(t.indexOf("."), t.length()),"");
                         }
-                        getnext(elements.get(i).attr("href"), name, t.substring(t.indexOf("."), t.length()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     ifnopage();
                     Message message = showlist.obtainMessage();
                     message.sendToTarget();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message message = failload.obtainMessage();
-                    message.sendToTarget();
-                }
 
+                }
             }
         }).start();
     }
 
     //分级加载
-    public void getnext(final String url, final String name, final String form) throws Exception {
+    public void getnext(final String url, final String name, final String form, final String author) throws Exception {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -75,7 +83,7 @@ public class shuyuzhe extends baseFragment {
                     Document doc2 = Jsoup.connect(url).data("query", "Java").userAgent("Mozilla").get();
                     Elements element3 = doc2.select("div.hero-unit:has(br)");
                     String t2 = element3.text();
-                    String time = t2.substring(t2.indexOf("发布日期："), t2.indexOf("资源介绍："));
+                    String time = author+t2.substring(t2.indexOf("发布日期："), t2.indexOf("资源介绍："));
                     String info = "格式：" + form + "\n" + t2.substring(t2.indexOf("文件标签："), t2.indexOf("发布日期：") - 2) + "\n" + t2.substring(t2.indexOf("资源介绍："), t2.length());
                     String durl = element3.select("div.common_content_main").select("a:contains(下载此书)").attr("href");
                     Message message = addlist.obtainMessage();

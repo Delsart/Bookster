@@ -37,23 +37,29 @@ public class m360d extends baseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Document doc = null;
+                setsearchingpage();
                 try {
-                    setsearchingpage();
-
-                    Document doc = Jsoup.connect(url).data("page", "" + page).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                    doc = Jsoup.connect(url).data("page", "" + page).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message message = failload.obtainMessage();
+                    message.sendToTarget();
+                }
                     //分析得到数据
+                if (doc!=null) {
                     Elements elements = doc.select("div[itemtype=http://schema.org/Novel].am-thumbnail");
                     for (int i = 0; i < elements.size(); i++) {
                         //统计数目
                         ii++;
                         //
-                        String name = "《" + elements.get(i).select("a[itemprop=name]").text() + "》作者：" + elements.get(i).select("a[itemprop=author]").text();
-                        String time = "更新时间：" + elements.get(i).select("span[itemprop=dateModified]").text() + "\n分类：" + elements.get(i).select("a[itemprop=genre]").text() + "\n状态：" + elements.get(i).select("span[itemprop=updataStatus]").text();
+                        String name =  elements.get(i).select("a[itemprop=name]").text();
+                        String time = "作者：" + elements.get(i).select("a[itemprop=author]").text()+"\n更新时间：" + elements.get(i).select("span[itemprop=dateModified]").text() + "\n分类：" + elements.get(i).select("a[itemprop=genre]").text() + "\n状态：" + elements.get(i).select("span[itemprop=updataStatus]").text();
                         String info = elements.get(i).select("div[itemprop=description]").text();
                         String durl = elements.get(i).select("a[itemprop=name]").attr("href");
-                        String pic ="http://www.360dxs.com/static/books/logo/"+durl.substring(durl.indexOf("_")+1,durl.indexOf(".html"))+"s.jpg";
+                        String pic = "http://www.360dxs.com/static/books/logo/" + durl.substring(durl.indexOf("_") + 1, durl.indexOf(".html")) + "s.jpg";
                         Message message = addlist.obtainMessage();
-                        message.obj = new mlist(name, time, info, durl,pic);
+                        message.obj = new mlist(name, time, info, durl, pic);
                         message.sendToTarget();
                     }
                     ifnopage();
@@ -64,12 +70,7 @@ public class m360d extends baseFragment {
                         page = 0;
                     Message message = showlist.obtainMessage();
                     message.sendToTarget();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message message = failload.obtainMessage();
-                    message.sendToTarget();
                 }
-
             }
         }).start();
     }
@@ -98,7 +99,6 @@ public class m360d extends baseFragment {
                 super.run();
                 try {
                     //获得下载地址
-
                     Document download = Jsoup.connect("http:" + url).timeout(10000).get();
                     String durl2= download.select("a:contains(分卷下载)").attr("href");
                     download = Jsoup.connect(download.select("a:contains(全文下载)").attr("href")).get();

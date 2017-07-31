@@ -2,8 +2,6 @@ package com.delsart.bookdownload;
 
 
 import android.app.Activity;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -27,13 +24,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.delsart.bookdownload.about.aboutActivity;
 import com.delsart.bookdownload.listandadapter.mpageAdapter;
+import com.delsart.bookdownload.searchengine.aixia;
 import com.delsart.bookdownload.searchengine.m360d;
+import com.delsart.bookdownload.searchengine.qishu;
 import com.delsart.bookdownload.searchengine.shuyuzhe;
 import com.delsart.bookdownload.searchengine.xiaoshuwu;
-import com.delsart.bookdownload.searchengine.qishu;
 import com.delsart.bookdownload.searchengine.zhixuan;
 import com.delsart.bookdownload.searchengine.zhoudu;
 
@@ -48,6 +47,8 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import moe.feng.alipay.zerosdk.AlipayZeroSdk;
+
 public class MainActivity extends AppCompatActivity {
     private com.delsart.bookdownload.searchengine.zhixuan zhixuan;
     private com.delsart.bookdownload.searchengine.zhoudu zhoudu;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private m360d m360d;
     private xiaoshuwu xiaoshuwu;
     private qishu qishu;
-
+    private com.delsart.bookdownload.searchengine.aixia aixia;
 
     SharedPreferences firstime;
     SharedPreferences.Editor editor;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     SearchView searchView;
     SharedPreferences autoupdate;
 
+    Activity activity=this;
 
     public static boolean MIUISetStatusBarLightMode(Activity activity, boolean dark) {
         boolean result = false;
@@ -151,9 +153,10 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("捐赠", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ClipboardManager cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    cmb.setText("15874082586");
-                    Snackbar.make(findViewById(R.id.main_content), "支付宝账号已复制", Snackbar.LENGTH_SHORT).show();
+                    if (AlipayZeroSdk.hasInstalledAlipayClient(mApplication.getContext()))
+                        AlipayZeroSdk.startAlipayClient(activity, "a6x02835mi3wh18ivz0mbdb");
+                    else
+                        Toast.makeText(getApplicationContext(),"没有安装支付宝",Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -297,13 +300,14 @@ public class MainActivity extends AppCompatActivity {
         m360d = new m360d();
         xiaoshuwu = new xiaoshuwu();
         qishu = new qishu();
-
+        aixia = new aixia();
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         pageadapter = new mpageAdapter(getSupportFragmentManager());
+        pageadapter.addFragment(aixia, "爱下");
         pageadapter.addFragment(zhixuan, "知轩藏书");
         pageadapter.addFragment(zhoudu, "周读");
         pageadapter.addFragment(m360d, "360℃");
@@ -321,21 +325,23 @@ public class MainActivity extends AppCompatActivity {
                 searchView.findFocus();
                 switch (tabLayout.getSelectedTabPosition()) {
                     case 0:
+                        aixia.totop();
+                    case 1:
                         zhixuan.totop();
                         break;
-                    case 1:
+                    case 2:
                         zhoudu.totop();
                         break;
-                    case 2:
+                    case 3:
                         m360d.totop();
                         break;
-                    case 3:
+                    case 4:
                         xiaoshuwu.totop();
                         break;
-                    case 4:
+                    case 5:
                         shuyuzhe.totop();
                         break;
-                    case 5:
+                    case 6:
                         qishu.totop();
                         break;
                 }
@@ -390,6 +396,7 @@ public class MainActivity extends AppCompatActivity {
                     shuyuzhe.get("https://book.shuyuzhe.com/search/" + toUtf8(query));
                     xiaoshuwu.get("http://mebook.cc/?s=" + toUtf8(query));
                     qishu.get("http://zhannei.baidu.com/cse/search?s=2672242722776283010&q=" + toUtf8(query));
+                    aixia.get("http://m.ixdzs.com/search?k=" + toUtf8(query));
 
                     viewPager.setLayerType(View.LAYER_TYPE_NONE, null);
 

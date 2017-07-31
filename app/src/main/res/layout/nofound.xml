@@ -15,7 +15,7 @@
     <TextView
         android:id="@+id/textView"
         android:padding="16dp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="没有找到，请尝试其他来源，或再试一次" />
 </LinearLayout>

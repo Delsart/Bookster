@@ -27,13 +27,20 @@ public class zhoudu extends baseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                setsearchingpage();
+                Document doc=null;
                 try {
-                    setsearchingpage();
-                    Document doc = Jsoup.connect(url).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                     doc = Jsoup.connect(url).data("query", "Java").userAgent("Mozilla").timeout(10000).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message message = failload.obtainMessage();
+                    message.sendToTarget();
+                }
+                if (doc!=null) {
                     //获得下页
                     loadmore = "";
-                    if (doc.select("a:contains(下一页>>)").attr("href").length()>5)
-                    loadmore ="http://www.ireadweek.com"+ doc.select("a:contains(下一页>>)").attr("href");
+                    if (doc.select("a:contains(下一页>>)").attr("href").length() > 5)
+                        loadmore = "http://www.ireadweek.com" + doc.select("a:contains(下一页>>)").attr("href");
                     //获得数据
                     Elements elements = doc.select("a[href^=/index.php]:has(li)");
                     for (int i = 5; i < elements.size(); i++) {
@@ -41,15 +48,15 @@ public class zhoudu extends baseFragment {
                         ii++;
                         //
                         String name = "《" + elements.get(i).select("div.hanghang-list-name").text() + "》" + "作者：" + elements.get(i).select("div.hanghang-list-zuozhe").text();
-                        getnext(elements.get(i).select("a").attr("href"), name, elements.get(i));
+                        try {
+                            getnext(elements.get(i).select("a").attr("href"), name, elements.get(i));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     ifnopage();
                     //判断为空
                     Message message = showlist.obtainMessage();
-                    message.sendToTarget();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message message = failload.obtainMessage();
                     message.sendToTarget();
                 }
 

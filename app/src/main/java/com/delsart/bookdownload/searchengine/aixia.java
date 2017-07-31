@@ -2,6 +2,7 @@ package com.delsart.bookdownload.searchengine;
 
 
 import android.os.Message;
+import android.util.Log;
 
 import com.delsart.bookdownload.listandadapter.mlist;
 
@@ -13,15 +14,16 @@ import org.jsoup.select.Elements;
  * Created by Delsart on 2017/7/22.
  */
 
-public class qishu extends baseFragment {
+public class aixia extends baseFragment {
     byte page = 1;
-
-    public qishu() {
+    String urls="http://m.ixdzs.com";
+    public aixia() {
         super();
     }
 
     public void get(String url) throws Exception {
         super.get(url);
+
     }
 
     @Override
@@ -37,7 +39,7 @@ public class qishu extends baseFragment {
                 Document doc = null;
                 setsearchingpage();
                 try {
-                    doc = Jsoup.connect(url).timeout(10000).userAgent("Mozilla").get();
+                    doc = Jsoup.connect(url).timeout(10000).get();
                 } catch (Exception e) {
                     Message message = failload.obtainMessage();
                     message.sendToTarget();
@@ -46,27 +48,27 @@ public class qishu extends baseFragment {
                 if (doc != null) {
                     //获得下一页数据
                     loadmore = "";
-                    loadmore = url + "&p=" + page;
+                    loadmore = urls + doc.select("a:containsOwn(下一页)").attr("href");
                     //分析得到数据
-                    Elements elements = doc.select("a[cpos=title]");
+                    Elements elements = doc.select("div.list").select("a");
                     for (int i = 0; i < elements.size(); i++) {
                         //统计数目
                         ii++;
+
                         //
-                        String durl = elements.get(i).attr("href");
-                        if (durl.contains(".html"))
-                            try {
-                                getnext(durl);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        String durl = urls + elements.get(i).attr("href");
+                        Log.d("test", "run: " + durl);
+                        try {
+                            getnext(durl);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     ifnopage();
                     page++;
                     Message message = showlist.obtainMessage();
                     message.sendToTarget();
-                }
-                else {
+                } else {
                     Message message = failload.obtainMessage();
                     message.sendToTarget();
                 }
@@ -79,7 +81,7 @@ public class qishu extends baseFragment {
         showdownload(lis);
     }
 
-    String[] lis = new String[3];
+    String[] lis = new String[2];
 
     //分级加载
     public void getnext(final String url) throws Exception {
@@ -88,22 +90,20 @@ public class qishu extends baseFragment {
             public void run() {
                 try {
                     Document doc2 = Jsoup.connect(url).get();
-                    Elements element3 = doc2.select("div.show");
-                    String t1 = element3.select("div.detail_right").select("ul").text();
-                    String name = element3.select("div.detail_right").select("h1").text();
-                    String time = t1.substring(t1.indexOf("书籍作者："), t1.indexOf("书籍等级"))+"\n"+t1.substring(t1.indexOf("书籍语言："), t1.indexOf("下载次数")) + "\n" + t1.substring(t1.indexOf("文件大小："), t1.indexOf("书籍类型")) + "\n" + t1.substring(t1.indexOf("书籍类型："), t1.indexOf("发布日期")) + "\n" + t1.substring(t1.indexOf("发布日期："), t1.indexOf("连载状态")) + "\n" + t1.substring(t1.indexOf("连载状态："), t1.indexOf("书籍作者"));
-                    String info = element3.select("div.showInfo").text();
-                    String durl = doc2.select("a:containsOwn(RAR格式下载)").attr("href");
-                    String durl2 = doc2.select("a:containsOwn(Txt格式下载)").attr("href");
-                    String durl3 = doc2.select("a:containsOwn(Epub格式下载)").attr("href");
-                    lis[0] = durl;
-                    lis[1] = durl2;
-                    lis[2] = durl3;
-                    String pic = "http://www.qisuu.com" + element3.select("div.showBox").select("img").attr("src");
+                    String t1 = doc2.select("div.list").get(0).text();
+                    String name = doc2.select("div.line").get(0).text();
+                    String time = t1.replace(" ", "\n").replace("<a href=\"http://www.d9cn.com/u", "");
+                    String info = doc2.select("div.intro").text();
+                    String durl =doc2.select("div.list").get(1).select("a").get(1).attr("href");
+                    String durl2 =doc2.select("div.list").get(1).select("a").get(2).attr("href");
+                    lis[0] =urls+ durl;
+                    lis[1] = urls+durl2;
+                    String pic = "";
                     Message message = addlist.obtainMessage();
                     message.obj = new mlist(name, time, info, durl, pic);
                     message.sendToTarget();
                 } catch (Exception e) {
+                    e.printStackTrace();
 
                 }
 

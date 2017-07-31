@@ -30,10 +30,16 @@ public class zhixuan extends baseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                setsearchingpage();
+                Document doc=null;
                 try {
-                    setsearchingpage();
-
-                    Document doc = Jsoup.connect(url).data("query", "Java").timeout(10000).get();
+                    doc = Jsoup.connect(url).data("query", "Java").timeout(10000).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Message message = failload.obtainMessage();
+                    message.sendToTarget();
+                }
+                if (doc!=null) {
                     //获得下一页数据
                     loadmore = "";
                     loadmore = doc.select("a.down_pagenavi").attr("href");
@@ -46,17 +52,17 @@ public class zhixuan extends baseFragment {
                         String name = elements.get(i).select("a[href]").text().replace("（校对版全本）", "");
                         String time = "收录日期：" + elements.get(i).select("span").text();
                         String info = elements.get(i).select("p").text().replace("　", "\n").replace("   ", "\n").replace("\n\n", "\n").replace("\n", "\n\n");
-                        getnext(elements.get(i).select("a[href]").attr("href"),name,time,info);
+                        try {
+                            getnext(elements.get(i).select("a[href]").attr("href"), name, time, info);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     ifnopage();
                     Message message = showlist.obtainMessage();
                     message.sendToTarget();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Message message = failload.obtainMessage();
-                    message.sendToTarget();
-                }
 
+                }
             }
         }).start();
     }

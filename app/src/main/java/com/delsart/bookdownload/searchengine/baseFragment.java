@@ -44,16 +44,16 @@ public class baseFragment extends Fragment {
     ArrayList<mlist> list = new ArrayList<>();
     String loadmore = "";
     ProgressDialog waitingDialog;
-String url;
+    String url;
     String clickdurl;
 
-    boolean delayload=false;
+    boolean delayload = false;
     boolean iffail = false;
     boolean ifseadching = false;
     View nosearchview;
     View nofoundview;
     View searching;
-    View view=null;
+    View view = null;
     int ii = 0;
     ImageView pic;
 
@@ -72,14 +72,14 @@ String url;
         }
     };
 
-public void get(String s) throws Exception {
-    url=s;
-    clean();
-    if (view!=null)
-        getpage(s);
-    else
-        delayload=true;
-}
+    public void get(String s) throws Exception {
+        url = s;
+        clean();
+        if (view != null)
+            getpage(s);
+        else
+            delayload = true;
+    }
 
     public void totop() {
         recyclerView.smoothScrollToPosition(0);
@@ -98,8 +98,6 @@ public void get(String s) throws Exception {
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
         adapter.setOnLoadMoreListener(lml, recyclerView);
     }
-
-
 
 
     Handler addlist = new Handler() {
@@ -155,7 +153,8 @@ public void get(String s) throws Exception {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } };
+        }
+    };
 
 
     public void getpage(final String url) throws Exception {
@@ -196,11 +195,13 @@ public void get(String s) throws Exception {
         message.obj = string;
         message.sendToTarget();
     }
+
     public void showdownload(String[] alist) {
         Message message = showdownloadpro.obtainMessage();
         message.obj = alist;
         message.sendToTarget();
     }
+
     Handler showdownloadpro = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
@@ -208,9 +209,9 @@ public void get(String s) throws Exception {
             try {
                 AlertDialog.Builder singleChoiceDialog =
                         new AlertDialog.Builder(getActivity());
-                final String[] a= (String[]) msg.obj;
+                final String[] a = (String[]) msg.obj;
                 singleChoiceDialog.setTitle("选择下载对象");
-                singleChoiceDialog.setItems( a,
+                singleChoiceDialog.setItems(a,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -218,12 +219,13 @@ public void get(String s) throws Exception {
                                 startActivity(new Intent(Intent.ACTION_VIEW, uri));
                             }
                         });
-                   singleChoiceDialog.show();
+                singleChoiceDialog.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } };
+        }
+    };
 
     public boolean getifnextpage() {
         return loadmore.length() > 5;
@@ -232,27 +234,29 @@ public void get(String s) throws Exception {
     public String getloadmore() {
         return loadmore;
     }
+
     Handler showpic = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            pic.setImageBitmap((Bitmap)msg.obj);
+            pic.setImageBitmap((Bitmap) msg.obj);
         }
 
     };
+
     public void showpic(final String picurl) throws Exception {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Log.d("ssss", "run: "+picurl);
-                    HttpURLConnection conn=(HttpURLConnection)new URL(picurl).openConnection();
+                    Log.d("ssss", "run: " + picurl);
+                    HttpURLConnection conn = (HttpURLConnection) new URL(picurl).openConnection();
                     conn.setConnectTimeout(6000);
                     conn.setDoInput(true);
                     InputStream is = conn.getInputStream();
 
-                    Bitmap bitmap =BitmapFactory.decodeStream(is);
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);
                     int width = bitmap.getWidth();
                     int height = bitmap.getHeight();
                     Matrix matrix = new Matrix();
@@ -271,7 +275,6 @@ public void get(String s) throws Exception {
     }
 
 
-
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater,
@@ -281,15 +284,15 @@ public void get(String s) throws Exception {
 
         view = inflater.inflate(R.layout.list, null, false);
         Log.d("sssss", "onCreateView: ");
-        nosearchview =inflater.inflate(R.layout.nosearch, null, false);
+        nosearchview = inflater.inflate(R.layout.nosearch, null, false);
         nofoundview = inflater.inflate(R.layout.nofound, null, false);
-        searching =inflater.inflate(R.layout.searching, null, false);
+        searching = inflater.inflate(R.layout.searching, null, false);
 
         waitingDialog = new ProgressDialog(getContext());
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
+
 
         if (ifseadching)
             adapter.setEmptyView(searching);
@@ -307,14 +310,14 @@ public void get(String s) throws Exception {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("查看");
                 View contentview = inflater.inflate(R.layout.mdialog, null);
-                LinearLayout linearLayout=(LinearLayout) contentview.findViewById(R.id.droot);
-                pic =(ImageView)linearLayout.getChildAt(1);
-                TextView name =(TextView)linearLayout.getChildAt(0);
-                TextView time=  (TextView)linearLayout.getChildAt(2);
-                TextView info= (TextView)linearLayout.getChildAt(3);
+                LinearLayout linearLayout = (LinearLayout) contentview.findViewById(R.id.droot);
+                pic = (ImageView) linearLayout.getChildAt(1);
+                TextView name = (TextView) linearLayout.getChildAt(0);
+                TextView time = (TextView) linearLayout.getChildAt(2);
+                TextView info = (TextView) linearLayout.getChildAt(3);
                 name.setText(list.get(position).getname());
                 time.setText(list.get(position).gettime());
-                info.setText(list.get(position).getinfo().replace("\n\n","\n"));
+                info.setText(list.get(position).getinfo().replace("\n\n", "\n"));
                 try {
                     showpic(list.get(position).getpic());
                 } catch (Exception e) {
@@ -341,12 +344,13 @@ public void get(String s) throws Exception {
             }
         });
 
-        if (delayload){
+        if (delayload) {
             try {
                 getpage(url);
             } catch (Exception e) {
                 e.printStackTrace();
-            }}
+            }
+        }
         return view;
     }
 

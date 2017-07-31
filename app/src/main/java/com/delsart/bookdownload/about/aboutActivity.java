@@ -1,13 +1,13 @@
 package com.delsart.bookdownload.about;
 
-import android.content.ClipboardManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder;
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
@@ -18,9 +18,12 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 import com.danielstone.materialaboutlibrary.util.ViewTypeManager;
 import com.delsart.bookdownload.R;
+import com.delsart.bookdownload.mApplication;
 import com.delsart.bookdownload.ui.MyViewTypeManager;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import moe.feng.alipay.zerosdk.AlipayZeroSdk;
 
 /**
  * Created by Delsart on 2017/7/24.
@@ -41,6 +44,7 @@ public class aboutActivity extends MaterialAboutActivity {
     @NonNull
     @Override
     protected MaterialAboutList getMaterialAboutList(final Context c) {
+        final Activity activity=this;
         getSupportActionBar().setElevation(8);
         MaterialAboutCard.Builder appCardBuilder = new MaterialAboutCard.Builder();
         // Add items to card
@@ -86,7 +90,8 @@ public class aboutActivity extends MaterialAboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_account)
                         .color(ContextCompat.getColor(c, colorIcon))
                         .sizeDp(18))
-                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("https://www.coolapk.com/u/473036")))
+                .setOnClickAction(
+                        ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("https://www.coolapk.com/u/473036")))
                 .build());
 
 
@@ -158,7 +163,7 @@ public class aboutActivity extends MaterialAboutActivity {
                 "Question concerning MaterialAboutLibrary"));
 
         convenienceCardBuilder.addItem(new MaterialAboutActionItem.Builder()
-                .text("请作者女装(误)喝杯果汁")
+                .text("捐赠，请作者女装(误)喝杯果汁")
                 .icon(new IconicsDrawable(c)
                         .icon(CommunityMaterial.Icon.cmd_coffee)
                         .color(ContextCompat.getColor(c, colorIcon))
@@ -166,9 +171,10 @@ public class aboutActivity extends MaterialAboutActivity {
                 .setOnClickAction(new MaterialAboutItemOnClickAction() {
                     @Override
                     public void onClick() {
-                        ClipboardManager cmb = (ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);
-                        cmb.setText("15874082586");
-                        Snackbar.make(((aboutActivity) c).findViewById(R.id.mal_material_about_activity_coordinator_layout), "支付宝账号已复制", Snackbar.LENGTH_SHORT).show();
+                        if ( AlipayZeroSdk.hasInstalledAlipayClient(mApplication.getContext()))
+                            AlipayZeroSdk.startAlipayClient(activity,"a6x02835mi3wh18ivz0mbdb" );
+                        else
+                            Toast.makeText(getApplicationContext(),"没有安装支付宝",Toast.LENGTH_SHORT).show();
                     }
                 })
                 .build());
@@ -181,6 +187,15 @@ public class aboutActivity extends MaterialAboutActivity {
 
         MaterialAboutCard.Builder otherCardBuilder = new MaterialAboutCard.Builder();
         otherCardBuilder.title("来源");
+        otherCardBuilder.addItem(ConvenienceBuilder.createWebsiteActionItem(c,
+                new IconicsDrawable(c)
+                        .icon(CommunityMaterial.Icon.cmd_earth)
+                        .color(ContextCompat.getColor(c, colorIcon))
+                        .sizeDp(18),
+                "爱下小说",
+                true,
+                Uri.parse("http://m.ixdzs.com")));
+
         otherCardBuilder.addItem(ConvenienceBuilder.createWebsiteActionItem(c,
                 new IconicsDrawable(c)
                         .icon(CommunityMaterial.Icon.cmd_earth)
