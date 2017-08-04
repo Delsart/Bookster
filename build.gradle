@@ -2,7 +2,11 @@
 
 buildscript {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url = 'https://dl.bintray.com/yuancloud/maven/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
@@ -14,8 +18,11 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter()
+        mavenCentral()
         maven { url "https://jitpack.io" }
+        maven { url = 'https://dl.bintray.com/yuancloud/maven/' }
     }
 }
 

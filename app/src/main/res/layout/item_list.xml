@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><!--suppress ALL -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/text_view_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/accent_material_light"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="@dimen/v16dp"
+        android:textColor="@color/White"
+        android:textSize="18sp" />
+
+    <com.delsart.bookdownload.custom.CustomTextView
+        android:id="@+id/text_view_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="12"
+        android:padding="@dimen/v16dp"
+        android:textSize="13sp" />
+</LinearLayout>
+
+
+

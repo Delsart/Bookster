@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:windowSoftInputMode="stateAlwaysHidden"
         android:theme="@style/AppTheme"
-        android:name=".mApplication"
+        android:name=".MyApplication"
         >
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:launchMode="singleTop">
@@ -26,17 +26,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".about.aboutActivity"
+            android:name=".ui.activity.AboutActivity"
             android:label="关于"
             android:launchMode="singleTop"
             android:theme="@style/aboutTheme" />
         <activity
-            android:name=".about.uesdOpenSource"
+            android:name=".ui.activity.UsedOpenSource"
             android:label="UsedOpenSources"
             android:launchMode="singleTop"
             android:theme="@style/aboutTheme" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.activity.SettingsActivity"
             android:theme="@style/settingTheme"
             android:label="@string/title_activity_settings"/>
     </application>

@@ -5,14 +5,13 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-android:fitsSystemWindows="true"
-    tools:context="com.delsart.bookdownload.MainActivity">
+    android:fitsSystemWindows="true"
+    tools:context="com.delsart.bookdownload.ui.activity.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -21,29 +20,24 @@ android:fitsSystemWindows="true"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-
-        </android.support.v7.widget.Toolbar>
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            app:tabIndicatorColor="@color/accent_material_light"
-            app:tabSelectedTextColor="@color/accent_material_light"
-            app:tabMode="scrollable"
-            app:tabMinWidth="75dp"
+            android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|enterAlways"
-            android:layout_height="wrap_content" />
+            app:tabIndicatorColor="@color/accent_material_light"
+            app:tabMinWidth="75dp"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="@color/accent_material_light" />
     </android.support.design.widget.AppBarLayout>
 
-    <com.github.ybq.parallaxviewpager.ParallaxViewPager
-        android:id="@+id/viewpager"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mode="left_overlay"
-        app:outset="10%"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:shadow_width="4dp"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -51,8 +45,8 @@ android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@mipmap/totopicon"
         android:clickable="true"
-        app:layout_behavior="com.delsart.bookdownload.ui.ScrollAwareFABBehaviorDefault"/>
+        app:layout_behavior="com.delsart.bookdownload.custom.ScrollAwareFABBehaviorDefault"
+        app:srcCompat="@mipmap/ic_to_top" />
 
 </android.support.design.widget.CoordinatorLayout>

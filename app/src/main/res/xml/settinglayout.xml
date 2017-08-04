@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:title="全局设置">
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="autoUpdate"
-        android:title="自动检测更新"
-        android:summaryOff="当前：关闭"
-        android:summaryOn="当前：开启"
-        />
-</PreferenceCategory>
+    <PreferenceCategory android:title="全局设置">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="autoUpdate"
+            android:summaryOff="当前：关闭"
+            android:summaryOn="当前：开启"
+            android:title="自动检测更新" />
+    </PreferenceCategory>
 </PreferenceScreen>
