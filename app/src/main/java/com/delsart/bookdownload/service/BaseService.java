@@ -7,13 +7,14 @@ import com.delsart.bookdownload.bean.DownloadBean;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class BaseService {
-    public abstract void get();
-    public abstract ArrayList<DownloadBean> getDownloadurls(String url) throws InterruptedException;
-
+    public ExecutorService mExecutorService= Executors.newFixedThreadPool(4);
     public BaseService(Handler handler, String keywords) {
     }
+
     public static String toUtf8(String str) {
         String result = null;
         try {
@@ -24,4 +25,11 @@ public abstract class BaseService {
         }
         return result;
     }
+
+    public void reLoad(){
+        get();
+    }
+    public abstract void get();
+
+    public abstract ArrayList<DownloadBean> getDownloadurls(String url) throws InterruptedException;
 }

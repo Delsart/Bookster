@@ -1,5 +1,6 @@
 package com.delsart.bookdownload.service;
 
+import android.icu.text.LocaleDisplayNames;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,23 +16,25 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.jar.Attributes;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ShuYuZheService extends BaseService {
+    private static String TAG = "test";
     private final Handler mHandler;
     private int mPage;
     private String mBaseUrl;
     private CountDownLatch latch;
     private ArrayList<NovelBean> list = new ArrayList<>();
-    private static String TAG = "test";
 
     public ShuYuZheService(Handler handler, String keywords) {
         super(handler, keywords);
         this.mHandler = handler;
         mPage = 1;
-        mBaseUrl = Url.SHUYUZHE + keywords + "/";
+        mBaseUrl = Url.SHUYUZHE + keywords;
     }
 
     @Override
@@ -41,22 +44,31 @@ public class ShuYuZheService extends BaseService {
             public void run() {
                 try {
                     list.clear();
-                    Elements select = Jsoup.connect(mBaseUrl + mPage)
+                    Log.d(TAG, "run: "+mBaseUrl + "/"+mPage);
+                    Elements select = Jsoup.connect(mBaseUrl + "/"+mPage)
                             .timeout(10000)
                             .ignoreContentType(true)
                             .ignoreHttpErrors(true)
+                            .userAgent(Url.PC_AGENT)
                             .get()
-                            .select("body > div.container > div > table > tbody > tr");
-                    latch = new CountDownLatch(select.size() - 1);
-                    for (int i = 1; i < select.size(); i++) {
-                        runInSameTime(select.get(i));
-                    }
-                    latch.await();
-                    mPage++;
+                            .select("body > div.container > div > div > div.panel.panel-success > div.panel-body > table > tbody > tr");
+                        latch = new CountDownLatch(select.size() - 1);
+                        for (int i = 1; i < select.size(); i++) {
+                            runInSameTime(select.get(i));
+                        }
+
+                        Log.d(TAG, "run: "+select.size());
+                        latch.await();
+                        mPage++;
+
+
+
+
                     Message msg = mHandler.obtainMessage();
                     msg.what = MsgType.SUCCESS;
                     msg.obj = list;
                     mHandler.sendMessage(msg);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     Message msg = mHandler.obtainMessage();
@@ -70,37 +82,40 @@ public class ShuYuZheService extends BaseService {
     }
 
     private void runInSameTime(final Element element) throws IOException {
-        new Thread(new Runnable() {
+        mExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Document document = null;
                 try {
-                    document = Jsoup.connect(element.select("td:nth-child(2) > a").attr("abs:href"))
+                    Document document = Jsoup.connect(element.select("td:nth-child(1) > a").attr("abs:href"))
                             .ignoreContentType(true)
+                            .userAgent(Url.PC_AGENT)
                             .get();
+                    Elements elements = document.select("ul.list-group");
+                    String name = elements.select("li").get(2).text().replace("文件名称：Book.ShuYuZhe.com书语者_","");
+                    String status =  elements.select("li").get(4).text();
 
-                Elements elements = document.select("div.hero-unit");
-                String t = elements.text();
-                String name = t.substring(0, t.indexOf("上一页")).replace("Book.ShuYuZhe.com书语者_", "");
-                String status = "文件格式：" + name.substring(name.lastIndexOf("."), name.length());
-                name = name.substring(0, name.lastIndexOf("."));
-                String time = t.substring(t.indexOf("发布日期"), t.indexOf("资源介绍"));
-                String info = t.substring(t.indexOf("资源介绍"), t.length());
-                String category = t.substring(t.indexOf("文件标签"), t.indexOf("发布日期"));
-                String author = "";
-                String words = t.substring(t.indexOf("资源大小"), t.indexOf("下载积分"));
-                String url = document.select("a:contains(下载此书)").attr("href");
-                String pic = "";
-                list.add(new NovelBean(name, time, info, category, status, author, words, pic, url));
-                latch.countDown();
-                }catch (SocketException e) {
-                    e.printStackTrace();
-                  latch.countDown();
+                    String time =  elements.select("li").get(6).text();
+
+                    String info = "";
+
+                    String category = elements.select("li").get(5).text();
+
+
+
+                    String author = "";
+
+                    String words =  elements.select("li").get(3).text();
+
+
+                    String url = document.select("a:contains(下载此书)").attr("href");
+                    String pic = "";
+                    list.add(new NovelBean(name, time, info, category, status, author, words, pic, url));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                latch.countDown();
             }
-        }).start();
+        });
     }
 
 
@@ -108,13 +123,13 @@ public class ShuYuZheService extends BaseService {
     public ArrayList<DownloadBean> getDownloadurls(final String url) throws InterruptedException {
         latch = new CountDownLatch(1);
         final ArrayList<DownloadBean> urls = new ArrayList<>();
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 urls.add(new DownloadBean("全文下载", url));
                 latch.countDown();
             }
-        }).start();
+        });
         latch.await();
         return urls;
     }

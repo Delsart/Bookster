@@ -1,6 +1,5 @@
 package com.delsart.bookdownload.adapter;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,10 +53,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView mTextViewName;
         private TextView mTextViewInfo;
-        private Context mContent;
+
         public MyViewHolder(View itemView) {
             super(itemView);
-            mContent = itemView.getContext();
             mTextViewInfo = (TextView) itemView.findViewById(R.id.text_view_info);
             mTextViewName = (TextView) itemView.findViewById(R.id.text_view_name);
         }

@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
@@ -28,11 +29,12 @@ import com.delsart.bookdownload.R;
 import com.delsart.bookdownload.adapter.PagerAdapter;
 import com.delsart.bookdownload.ui.fragment.AiXiaFragment;
 import com.delsart.bookdownload.ui.fragment.BaseFragment;
+import com.delsart.bookdownload.ui.fragment.BlahFragment;
+import com.delsart.bookdownload.ui.fragment.DongManZhiJiaFragment;
 import com.delsart.bookdownload.ui.fragment.M360DFragment;
 import com.delsart.bookdownload.ui.fragment.QiShuFragment;
 import com.delsart.bookdownload.ui.fragment.ShuYuZheFragment;
 import com.delsart.bookdownload.ui.fragment.XiaoShuWuFragment;
-import com.delsart.bookdownload.ui.fragment.BlahFragment;
 import com.delsart.bookdownload.ui.fragment.ZhiXuanFragment;
 import com.delsart.bookdownload.ui.fragment.ZhouDuFragment;
 import com.delsart.bookdownload.utils.StatusBarUtils;
@@ -50,21 +52,42 @@ import java.util.List;
 import moe.feng.alipay.zerosdk.AlipayZeroSdk;
 
 public class MainActivity extends AppCompatActivity {
-    SharedPreferences firstime;
-    SharedPreferences.Editor editor;
-    PagerAdapter mPagerAdapter;
-    SearchView searchView;
-    SharedPreferences autoupdate;
+    private SharedPreferences firstime;
+    private SharedPreferences.Editor editor;
+    private PagerAdapter mPagerAdapter;
+    private SearchView searchView;
+    private SharedPreferences autoupdate;
+    String lastKeyWords = "";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false))
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.DayTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        autoupdate = getSharedPreferences("com.delsart.bookdownload_preferences", MODE_PRIVATE);
         StatusBarUtils.MIUISetStatusBarLightMode(this, true);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initView();
+        showInfoDialog();
+
+
+        if (autoupdate.getBoolean("autoUpdate", true)) {
+
+//            try {
+//                getUpdate();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+        }
+    }
+
+    private void showInfoDialog() {
         firstime = getSharedPreferences("data", MODE_PRIVATE);
         editor = firstime.edit();
         if (firstime.getInt("first", 0) == 0) {
@@ -124,31 +147,17 @@ public class MainActivity extends AppCompatActivity {
             editor.putInt("showrate", firstime.getInt("showrate", 1) + 1);
             editor.apply();
         }
-
-        autoupdate = getSharedPreferences("com.delsart.bookdownload_preferences", MODE_PRIVATE);
-        if (autoupdate.getBoolean("autoUpdate", true)) {
-
-            try {
-                getUpdate();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
-
 
     private void getUpdate() throws Exception {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-
                     URL url = new URL("https://hereacg.org/bookster/update.json");
-
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(3000);
-
                     InputStream in = connection.getInputStream();
                     // 下面对获取到的输入流进行读取
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -158,8 +167,6 @@ public class MainActivity extends AppCompatActivity {
                         response.append(line);
                     }
                     parseJSONWithJSONObject(response.toString());
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -173,24 +180,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-
                     JSONObject jsonObject = new JSONObject(jsonData);
-
                     String version = jsonObject.getString("version");
                     String info = jsonObject.getString("info");
                     String time = jsonObject.getString("time");
                     String size = jsonObject.getString("size");
                     final String url = jsonObject.getString("url");
-                    PackageManager manager;
-
-                    PackageInfo infos = null;
-                    manager = getPackageManager();
-                    try {
-                        infos = manager.getPackageInfo(getPackageName(), 0);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
+                    PackageManager manager = getPackageManager();
+                    PackageInfo infos = manager.getPackageInfo(getPackageName(), 0);
                     Log.d("sss", "run: " + version + gettrueversion(version) + "ssssss" + gettrueversion(infos.versionName));
                     if (gettrueversion(version) > gettrueversion(infos.versionName)) {
                         showupdate(version, time, size, info, url);
@@ -243,27 +240,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initView() {
-        getWindow().setBackgroundDrawableResource(R.color.White);
-        List<BaseFragment> fragments = new ArrayList<>();
-        List<String> titles = new ArrayList<>();
-        fragments.add(new AiXiaFragment());
+    List<BaseFragment> fragments = new ArrayList<>();
+    List<String> titles = new ArrayList<>();
 
-        fragments.add(new ZhiXuanFragment());
-        fragments.add(new ZhouDuFragment());
-        fragments.add(new ShuYuZheFragment());
-        fragments.add(new M360DFragment());
-      fragments.add(new XiaoShuWuFragment());
-        fragments.add(new QiShuFragment());
-        fragments.add(new BlahFragment());
-        titles.add("爱下");
-        titles.add("知轩藏书");
-        titles.add("周读");
-        titles.add("书语者");
-        titles.add("360℃");
-       titles.add("我的小书屋");
-        titles.add("奇书");
-        titles.add("blah");
+    private void initView() {
+        getWindow().setBackgroundDrawable(null);
+        addpage(new AiXiaFragment(), "爱下");
+        addpage(new ZhiXuanFragment(), "知轩藏书");
+        addpage(new ZhouDuFragment(), "周读");
+        addpage(new ShuYuZheFragment(), "书语者");
+        addpage(new DongManZhiJiaFragment(), "动漫之家");
+        addpage(new M360DFragment(), "360℃");
+        addpage(new XiaoShuWuFragment(), "我的小书屋");
+        addpage(new QiShuFragment(), "奇书");
+        addpage(new BlahFragment(), "blah");
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -279,6 +270,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false)) {
+            tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.DarkColor));
+            tabLayout.setTabTextColors(tabLayout.getTabTextColors().getDefaultColor(), getResources().getColor(R.color.DarkColor));
+        }
+    }
+
+    private void addpage(BaseFragment fragment, String s) {
+
+        if (autoupdate.getBoolean(s, true)) {
+            fragments.add(fragment);
+            titles.add(s);
+        }
     }
 
     @Override
@@ -290,6 +293,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.setting:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+            case R.id.Theme:
+                SharedPreferences.Editor meditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false))
+                    meditor.putBoolean("dark_theme", false);
+                else
+                    meditor.putBoolean("dark_theme", true);
+                meditor.apply();
+                Intent intent = getIntent();
+
+                startActivity(intent);
+                this.overridePendingTransition(R.anim.enter_anim,0);
+                finish();
+
+                break;
         }
         return true;
     }
@@ -297,16 +314,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        //Toolbar的搜索框
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false))
+            menu.findItem(R.id.Theme).setTitle("今夜白");
         final MenuItem searchItem = menu.findItem(R.id.toolbar_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("搜索书籍或者作者");
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setQuery(lastKeyWords, false);
+            }
+        });
+
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //处理搜索结果
                 try {
+                    lastKeyWords = query;
                     Runtime runtime = Runtime.getRuntime();
                     runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);
                     runtime.exec("input keyevent " + KeyEvent.KEYCODE_BACK);

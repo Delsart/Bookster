@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class ZhouDuService extends BaseService {
+    private static String TAG = "test";
     private final Handler mHandler;
     private int mPage;
     private String mBaseUrl;
     private CountDownLatch latch;
     private ArrayList<NovelBean> list = new ArrayList<>();
-    private static String TAG = "test";
 
     public ZhouDuService(Handler handler, String keywords) {
         super(handler, keywords);
@@ -68,42 +68,40 @@ public class ZhouDuService extends BaseService {
     }
 
     private void runInSameTime(final Element element) throws IOException {
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                Document document = null;
-
                 try {
-                    document = Jsoup.connect(element.attr("abs:href"))
-                             .ignoreContentType(true)
+                    Document document = Jsoup.connect(element.attr("abs:href"))
+                            .ignoreContentType(true)
+                            .ignoreHttpErrors(true)
                             .get();
+
+                    String t = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font").text();
+                    if (t.length() < 5) {
+                        latch.countDown();
+                        return;
+                    }
+                    String name = document.select("body > div > div > div.hanghang-za > div:nth-child(1)").text();
+                    String status = "";
+                    String time = "";
+                    String info = t.substring(t.indexOf("简介"), t.length());
+                    String category = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font > p:nth-child(2)").text();
+                    String author = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font > p:nth-child(1)").text();
+                    String words = "";
+                    String url = document.select("body > div > div > div.hanghang-za > div.hanghang-box > div.hanghang-shu-content-btn > a").attr("href");
+                    String pic = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-img > img").attr("abs:src");
+                    NovelBean no = new NovelBean(name, time, info, category, status, author, words, pic, url);
+                    list.add(no);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (document == null) {
-                    latch.countDown();
-                    return;
-                }
-                String t = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font").text();
-                if (t.length() < 5) {
-                    latch.countDown();
-                    return;
-                }
-                String name = document.select("body > div > div > div.hanghang-za > div:nth-child(1)").text();
-                String status = "";
-                String time = "";
-                String info = t.substring(t.indexOf("简介"), t.length());
-                String category = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font > p:nth-child(2)").text();
-                String author = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-font > p:nth-child(1)").text();
-                String words = "";
-                String url = document.select("body > div > div > div.hanghang-za > div.hanghang-box > div.hanghang-shu-content-btn > a").attr("href");
-                String pic = document.select("body > div > div > div.hanghang-za > div.hanghang-shu-content > div.hanghang-shu-content-img > img").attr("abs:src");
-                NovelBean no = new NovelBean(name, time, info, category, status, author, words, pic, url);
-                list.add(no);
+
+
                 latch.countDown();
 
             }
-        }).start();
+        });
     }
 
 
@@ -111,13 +109,13 @@ public class ZhouDuService extends BaseService {
     public ArrayList<DownloadBean> getDownloadurls(final String url) throws InterruptedException {
         latch = new CountDownLatch(1);
         final ArrayList<DownloadBean> urls = new ArrayList<>();
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 urls.add(new DownloadBean("百度云", url));
                 latch.countDown();
             }
-        }).start();
+        });
         latch.await();
         return urls;
     }

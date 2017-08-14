@@ -14,22 +14,19 @@
 
 
         <TextView
-            android:id="@+id/dname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
             android:textSize="17sp" />
 
         <ImageView
-            android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
             android:adjustViewBounds="true"
+            android:paddingTop="10dp"
             tools:ignore="ContentDescription" />
 
         <TextView
-            android:id="@+id/dinfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp" />

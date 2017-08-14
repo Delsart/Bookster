@@ -10,14 +10,17 @@ import com.delsart.bookdownload.bean.NovelBean;
  */
 
 public class MyItemAdapter extends BaseQuickAdapter<NovelBean, BaseViewHolder> {
-
-    public MyItemAdapter() {
+private int color;
+    public MyItemAdapter(int color) {
         super(R.layout.item_list);
+        this.color=color;
     }
 
     @Override
     protected void convert(BaseViewHolder viewHolder, NovelBean bean) {
-viewHolder.setText(R.id.text_view_name,bean.getName())
-        .setText(R.id.text_view_info,bean.getShowText());
+        viewHolder.setText(R.id.text_view_name, bean.getName())
+                .setText(R.id.text_view_info, bean.getShowText())
+                .setBackgroundColor(R.id.text_view_name,color)
+                .setBackgroundColor(R.id.text_view_info,color);
     }
 }

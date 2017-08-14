@@ -8,4 +8,42 @@
             android:summaryOn="当前：开启"
             android:title="自动检测更新" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="来源设置（下次启动生效）">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="爱下"
+            android:title="爱下" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="Blah"
+            android:title="Blah" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="动漫之家"
+            android:title="动漫之家" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="360℃"
+            android:title="360℃" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="奇书"
+            android:title="奇书" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="书语者"
+            android:title="书语者" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="小书屋"
+            android:title="小书屋" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="知轩"
+            android:title="知轩" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="周读"
+            android:title="周读" />
+    </PreferenceCategory>
 </PreferenceScreen>

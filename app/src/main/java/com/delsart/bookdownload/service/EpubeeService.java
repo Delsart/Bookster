@@ -15,24 +15,22 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class BlahService extends BaseService {
-    private static String TAG = "test";
+public class EpubeeService extends BaseService {
     private final Handler mHandler;
     private int mPage;
     private String mBaseUrl;
     private CountDownLatch latch;
     private ArrayList<NovelBean> list = new ArrayList<>();
 
-    public BlahService(Handler handler, String keywords) {
+    public EpubeeService(Handler handler, String keywords) {
         super(handler, keywords);
         this.mHandler = handler;
         mPage = 1;
-        mBaseUrl = Url.BLAH + keywords + "&page=";
+        mBaseUrl = Url.AIXIA + keywords + "&page=";
     }
-    String lasts="";
+
     @Override
     public void get() {
         new Thread(new Runnable() {
@@ -46,16 +44,12 @@ public class BlahService extends BaseService {
                             .ignoreHttpErrors(true)
                             .userAgent(Url.MOBBILE_AGENT)
                             .get()
-                            .select("div.ok-book-item").select("a.okShowInfoModal");
+                            .select("body > div.list > li > a");
                     latch = new CountDownLatch(select.size());
-                    for (int i = 0; i < select.size(); i++) {
-                        runInSameTime(select.get(i));
+                    for (Element element : select) {
+                        runInSameTime(element);
                     }
                     latch.await();
-if (select.toString().equals(lasts))
-    list.clear();
-                    lasts=select.toString();
-
                     mPage++;
                     Message msg = mHandler.obtainMessage();
                     msg.what = MsgType.SUCCESS;
@@ -84,30 +78,19 @@ if (select.toString().equals(lasts))
                             .ignoreHttpErrors(true)
                             .userAgent(Url.MOBBILE_AGENT)
                             .get();
-
-                    String name = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-8.ok-book-info > div.ok-book-meta > h1").text();
-                    String time = "";
-                    String info = "";
-                    Elements elements = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-8.ok-book-info > div.ok-book-meta > div.ok-book-desc > div.ok-book-meta-content").select("p");
-                    for (int i = 0; i < elements.size(); i++) {
-
-
-                        if (!elements.get(i).text().equals(""))
-                            info = info + elements.get(i).text() + "\n\n";
-
-
-                    }
-                    String category = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-8.ok-book-info > div.ok-book-meta > div.ok-book-subjects").text();
-                    String status = "";
-                    String author = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-8.ok-book-info > div.ok-book-meta > div.row > div > div").text();
-                    String words = "";
-                    String pic = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-4 > div > img").attr("abs:src");
+                    String name = document.select("body > div:nth-child(2) > h1").text();
+                    String time = document.select("body > div:nth-child(3) > li:nth-child(6)").text();
+                    String info = document.select("body > div.intro > li").text();
+                    String category = document.select("body > div:nth-child(3) > li:nth-child(2)").text();
+                    String status = document.select("body > div:nth-child(3) > li:nth-child(5)").text();
+                    String author = document.select("body > div:nth-child(3) > li:nth-child(1)").text();
+                    String words = document.select("body > div:nth-child(3) > li:nth-child(3)").text();
+                    String pic = "";
                     NovelBean no = new NovelBean(name, time, info, category, status, author, words, pic, url);
                     list.add(no);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 latch.countDown();
             }
         });
@@ -122,24 +105,22 @@ if (select.toString().equals(lasts))
             @Override
             public void run() {
                 try {
-                Document document = Jsoup.connect(url)
+                    Elements elements = Jsoup.connect(url)
                             .timeout(10000)
                             .ignoreContentType(true)
                             .ignoreHttpErrors(true)
                             .userAgent(Url.MOBBILE_AGENT)
-                            .get();
-
-                    Elements elements = document.select("#okBookShow > div.ok-book-base-info > div.row > div.col-sm-8.ok-book-info > div.ok-book-opt > div > div.col-md-5.ok-book-download > div a");
-                    if (elements != null) {
-                        for (Element element : elements) {
-                            urls.add(new DownloadBean(element.text(), element.attr("abs:href")));
-                        }
-                    }
-
+                            .get()
+                            .select("body > div:nth-child(5)");
+                    String u1 = elements.select("li:nth-child(2) > a").attr("abs:href");
+                    String u1n = elements.select("li:nth-child(2) > a").text();
+                    String u2 = elements.select("li:nth-child(3) > a").attr("abs:href");
+                    String u2n = elements.select("li:nth-child(3) > a").text();
+                    urls.add(new DownloadBean(u1n, u1));
+                    urls.add(new DownloadBean(u2n, u2));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 latch.countDown();
             }
         });

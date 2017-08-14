@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompatSideChannelService;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -35,16 +39,17 @@ import com.delsart.bookdownload.service.BaseService;
 import java.util.ArrayList;
 
 public abstract class BaseFragment extends Fragment {
+    public final MyHandler<BaseFragment> mHandler = new MyHandler<>(this);
     private RecyclerView mRecyclerView;
-    private MyItemAdapter mAdapter;
-    private BaseService mService;
-    private ArrayList<NovelBean> mList = new ArrayList<>();
+    public MyItemAdapter mAdapter;
+    public BaseService mService;
+    public ArrayList<NovelBean> mList = new ArrayList<>();
     private ProgressDialog waitingDialog;
-    private View mNoFoundView;
-private View mSearchingView;
-    protected abstract BaseService getService(Handler handler, String keywords);
+    public View mNoFoundView;
+    private View mSearchingView;
 
-    private final MyHandler<BaseFragment> mHandler = new MyHandler<>(this);
+
+    protected abstract BaseService getService(Handler handler, String keywords);
 
     @Nullable
     @Override
@@ -54,42 +59,70 @@ private View mSearchingView;
         mSearchingView = inflater.inflate(R.layout.view_searching, null, false);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.recycler_view, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        mRecyclerView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        mAdapter = new MyItemAdapter();
+        if (PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean("dark_theme",false))
+        {
+            mRecyclerView.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.DarkRecyclerViewBackground));
+            mAdapter = new MyItemAdapter(ContextCompat.getColor(getContext(),R.color.DarkMainColor));
+        }else
+        mAdapter = new MyItemAdapter(ContextCompat.getColor(getContext(),R.color.DayColor));
         mAdapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
         mAdapter.setEmptyView(mNoSearchView);
         mRecyclerView.setAdapter(mAdapter);
+
+
         initLoadMore();
         setOnClickEvent();
+        initReLoad();
         return view;
     }
 
-    private void initLoadMore() {
+
+    private void initReLoad() {
+        mNoFoundView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.setEmptyView(mSearchingView);
+                mService.reLoad();
+            }
+        });
+    }
+
+    public void initLoadMore() {
         mAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 mService.get();
             }
-        });
+        }, mRecyclerView);
     }
 
     private void setOnClickEvent() {
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, final int position) {
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("查看");
-                View contentview = LayoutInflater.from(getContext()).inflate(R.layout.view_dialog, null);
-                LinearLayout linearLayout = (LinearLayout) contentview.findViewById(R.id.droot);
-                TextView name = (TextView) linearLayout.getChildAt(0);
-                ImageView pic = (ImageView) linearLayout.getChildAt(1);
-                TextView info = (TextView) linearLayout.getChildAt(2);
-                name.setText(mList.get(position).getName());
-                info.setText(mList.get(position).getShowText());
-                Glide.with(getContext()).load(mList.get(position).getPic()).into(pic);
-                builder.setView(contentview);
+                View mDialogView = LayoutInflater.from(getContext()).inflate(R.layout.view_dialog, null);
+                LinearLayout linearLayout = (LinearLayout) mDialogView.findViewById(R.id.droot);
+                TextView mDialogName = (TextView) linearLayout.getChildAt(0);
+                ImageView mDialogPic = (ImageView) linearLayout.getChildAt(1);
+                TextView mDialogInfo = (TextView) linearLayout.getChildAt(2);
+                mDialogName.setText(mList.get(position).getName());
+                mDialogInfo.setText(mList.get(position).getShowText());
+                Glide.with(getContext()).load(mList.get(position).getPic()).into(mDialogPic);
+                mDialogPic.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toast.makeText(getContext(),"在网页中打开图片",Toast.LENGTH_SHORT).show();
+                        Uri uri = Uri.parse(mList.get(position).getPic());
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                        return false;
+                    }
+                });
+                builder.setView(mDialogView);
                 builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -104,11 +137,12 @@ private View mSearchingView;
                                 @Override
                                 public void run() {
                                     try {
-                                        doOnClickDownload(mService.getDownloadurls(mList.get(position).getDownload_from_url()));
+                                        doOnClickDownload(mService.getDownloadurls(mList.get(position).getDownloadFromUrl()));
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                }}).start();
+                                }
+                            }).start();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -119,7 +153,6 @@ private View mSearchingView;
             }
         });
     }
-
 
     public void doOnClickDownload(final ArrayList<DownloadBean> urls) {
         String[] sList = new String[urls.size()];
@@ -132,19 +165,14 @@ private View mSearchingView;
         builder.setItems(sList, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              String url=  urls.get(which).getUrl();
+                String url = urls.get(which).getUrl();
                 if (!url.equals("")) {
                     Uri uri = Uri.parse(url);
                     startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 }
             }
         });
-        builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
+        builder.setPositiveButton("取消", null);
         builder.create().show();
         waitingDialog.dismiss();
         Looper.loop();
@@ -160,7 +188,7 @@ private View mSearchingView;
     }
 
 
-    private void runService() {
+    public void runService() {
         mService.get();
         mHandler.setOnHandleMessageCallback(new OnHandleMessageCallback<BaseFragment>() {
             @Override

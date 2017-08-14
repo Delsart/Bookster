@@ -4,10 +4,10 @@
     <item
         android:id="@+id/toolbar_search"
         android:icon="?android:attr/actionModeWebSearchDrawable"
-        android:orderInCategory="100"
+
         android:title="@string/search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView" />
+        app:showAsAction="always|collapseActionView" />
     <item
         android:id="@+id/setting"
         android:title="@string/settings"
@@ -15,5 +15,9 @@
     <item
         android:id="@+id/about"
         android:title="@string/about"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/Theme"
+        android:title="@string/themeDefault"
         app:showAsAction="never" />
 </menu>

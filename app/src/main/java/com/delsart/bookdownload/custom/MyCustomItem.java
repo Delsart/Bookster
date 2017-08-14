@@ -29,68 +29,18 @@ import static android.view.View.GONE;
 
 public class MyCustomItem extends MaterialAboutItem {
 
-    public interface OnClickListener {
-        void onClick();
-
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({GRAVITY_TOP, GRAVITY_MIDDLE, GRAVITY_BOTTOM})
-    public @interface IconGravity {
-    }
-
     public static final int GRAVITY_TOP = 0;
     public static final int GRAVITY_MIDDLE = 1;
     public static final int GRAVITY_BOTTOM = 2;
-
     private CharSequence text = null;
     private int textRes = 0;
-
     private CharSequence subText = null;
     private int subTextRes = 0;
-
     private Drawable icon = null;
     private int iconRes = 0;
     private boolean showIcon = true;
     private int iconGravity = GRAVITY_MIDDLE;
-
     private MyCustomItem.OnClickListener onClickListener = null;
-
-    @Override
-    public int getType() {
-        return MyViewTypeManager.CUSTOM_ITEM;
-    }
-
-    public static MaterialAboutItemViewHolder getViewHolder(View view) {
-        return new MyCustomItemViewHolder(view);
-    }
-
-    public static class MyCustomItemViewHolder extends MaterialAboutItemViewHolder implements View.OnClickListener {
-        public final View view;
-        public final ImageView icon;
-        public final TextView text;
-        public final TextView subText;
-        public MyCustomItem.OnClickListener onClickListener;
-
-        MyCustomItemViewHolder(View view) {
-            super(view);
-            this.view = view;
-            icon = (ImageView) view.findViewById(R.id.mal_item_image);
-            text = (TextView) view.findViewById(R.id.mal_item_text);
-            subText = (TextView) view.findViewById(R.id.mal_action_item_subtext);
-
-            view.setOnClickListener(this);
-            onClickListener = null;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (onClickListener != null) {
-                onClickListener.onClick();
-            }
-        }
-    }
-
     private MyCustomItem(Builder builder) {
         this.text = builder.text;
         this.textRes = builder.textRes;
@@ -134,41 +84,8 @@ public class MyCustomItem extends MaterialAboutItem {
         this.iconRes = iconRes;
     }
 
-    public CharSequence getText() {
-        return text;
-    }
-
-    public int getTextRes() {
-        return textRes;
-    }
-
-    public CharSequence getSubText() {
-        return subText;
-    }
-
-    public int getSubTextRes() {
-        return subTextRes;
-    }
-
-    public Drawable getIcon() {
-        return icon;
-    }
-
-    public int getIconRes() {
-        return iconRes;
-    }
-
-    public boolean shouldShowIcon() {
-        return showIcon;
-    }
-
-    @IconGravity
-    public int getIconGravity() {
-        return iconGravity;
-    }
-
-    public MyCustomItem.OnClickListener getOnClickListener() {
-        return onClickListener;
+    public static MaterialAboutItemViewHolder getViewHolder(View view) {
+        return new MyCustomItemViewHolder(view);
     }
 
     public static void setupItem(MyCustomItemViewHolder holder, MyCustomItem item, Context context) {
@@ -250,26 +167,99 @@ public class MyCustomItem extends MaterialAboutItem {
         }
     }
 
+    @Override
+    public int getType() {
+        return MyViewTypeManager.CUSTOM_ITEM;
+    }
+
+    public CharSequence getText() {
+        return text;
+    }
+
+    public int getTextRes() {
+        return textRes;
+    }
+
+    public CharSequence getSubText() {
+        return subText;
+    }
+
+    public int getSubTextRes() {
+        return subTextRes;
+    }
+
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    public int getIconRes() {
+        return iconRes;
+    }
+
+    public boolean shouldShowIcon() {
+        return showIcon;
+    }
+
+    @IconGravity
+    public int getIconGravity() {
+        return iconGravity;
+    }
+
+    public MyCustomItem.OnClickListener getOnClickListener() {
+        return onClickListener;
+    }
+
+    public interface OnClickListener {
+        void onClick();
+
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({GRAVITY_TOP, GRAVITY_MIDDLE, GRAVITY_BOTTOM})
+    public @interface IconGravity {
+    }
+
+    public static class MyCustomItemViewHolder extends MaterialAboutItemViewHolder implements View.OnClickListener {
+        public final View view;
+        public final ImageView icon;
+        public final TextView text;
+        public final TextView subText;
+        public MyCustomItem.OnClickListener onClickListener;
+
+        MyCustomItemViewHolder(View view) {
+            super(view);
+            this.view = view;
+            icon = (ImageView) view.findViewById(R.id.mal_item_image);
+            text = (TextView) view.findViewById(R.id.mal_item_text);
+            subText = (TextView) view.findViewById(R.id.mal_action_item_subtext);
+
+            view.setOnClickListener(this);
+            onClickListener = null;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onClickListener != null) {
+                onClickListener.onClick();
+            }
+        }
+    }
+
     public static class Builder {
 
+        MyCustomItem.OnClickListener onClickListener;
         private CharSequence text = null;
         @StringRes
         private int textRes = 0;
-
         private CharSequence subText = null;
         @StringRes
         private int subTextRes = 0;
-
         private Drawable icon = null;
         @DrawableRes
         private int iconRes = 0;
-
         private boolean showIcon = true;
-
         @IconGravity
         private int iconGravity = GRAVITY_MIDDLE;
-
-        MyCustomItem.OnClickListener onClickListener;
 
         public Builder text(CharSequence text) {
             this.text = text;

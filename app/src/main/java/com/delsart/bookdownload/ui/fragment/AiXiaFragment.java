@@ -10,6 +10,6 @@ public class AiXiaFragment extends BaseFragment {
 
     @Override
     protected BaseService getService(Handler handler, String keywords) {
-        return new AiXiaService(handler,keywords);
+        return new AiXiaService(handler, keywords);
     }
 }

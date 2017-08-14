@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">#ffffff</item>
+
+    <style name="DayTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/DayBackground</item>
         <item name="colorPrimaryDark">#eeeeee</item>
-        <item name="colorAccent">@color/accent_material_light</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorAccent">@color/DayColor</item>
         <item name="android:navigationBarColor">#cccccc</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="android:toolbarStyle">@style/ThemeOverlay.AppCompat.Light</item>
+
     </style>
+    <style name="DarkTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/DarkBackground</item>
+        <item name="colorPrimaryDark">#262626</item>
+        <item name="colorAccent">#4C708E</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#000000</item>
+    </style>
+
+
+
     <style name="settingTheme" parent="@android:style/Theme.Material.Light">
         <item name="colorPrimary">#ffffff</item>
         <item name="colorPrimaryDark">#eeeeee</item>
@@ -16,6 +31,17 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">#cccccc</item>
     </style>
+
+    <style name="DarkThemeSettingTheme" parent="@android:style/Theme.Material">
+        <item name="android:statusBarColor">#262626</item>
+        <item name="colorPrimary">@color/DarkBackground</item>
+        <item name="colorPrimaryDark">#262626</item>
+        <item name="colorAccent">@color/DarkColor</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+
+
     <style name="aboutTheme" parent="Theme.Mal.Light.LightActionBar">
         <item name="colorPrimary">#ffffff</item>
         <item name="colorPrimaryDark">#eeeeee</item>
@@ -23,5 +49,13 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">#cccccc</item>
         <item name="windowNoTitle">true</item>
+    </style>
+    <style name="DarkTheme.aboutTheme" parent="Theme.Mal.Dark.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/DarkBackground</item>
+        <item name="colorPrimaryDark">#262626</item>
+        <item name="colorAccent">@color/DarkColor</item>
+        <item name="android:windowLightStatusBar">false</item>
+
     </style>
 </resources>

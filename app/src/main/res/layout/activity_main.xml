@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.delsart.bookdownload.ui.activity.MainActivity">
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+       >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -20,17 +16,17 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+          />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:tabIndicatorColor="@color/accent_material_light"
             app:tabMinWidth="75dp"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/accent_material_light" />
+            style="@style/DayTheme.tabLayout"
+          />
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager
@@ -46,7 +42,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        app:layout_behavior="com.delsart.bookdownload.custom.ScrollAwareFABBehaviorDefault"
+        app:layout_behavior="com.delsart.bookdownload.custom.ScrollAwareFABBehavior"
         app:srcCompat="@mipmap/ic_to_top" />
 
 </android.support.design.widget.CoordinatorLayout>

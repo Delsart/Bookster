@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:gravity="center"
+    android:orientation="vertical">
 
     <ImageView
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         android:layout_marginTop="-140dp"
-        android:id="@+id/imageView"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
-        app:srcCompat="@mipmap/ic_no_search" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:padding="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/emptytext" />
+        app:srcCompat="@mipmap/ic_no_search"
+        tools:ignore="ContentDescription" />
 </LinearLayout>

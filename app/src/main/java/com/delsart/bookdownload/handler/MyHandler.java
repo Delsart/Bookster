@@ -9,12 +9,11 @@ import java.lang.ref.WeakReference;
 public class MyHandler<T> extends Handler {
 
     private final WeakReference<T> mReference;
+    private OnHandleMessageCallback<T> onHandleMessageCallback;
 
     public MyHandler(T t) {
         mReference = new WeakReference<>(t);
     }
-
-    private OnHandleMessageCallback<T> onHandleMessageCallback;
 
     public void setOnHandleMessageCallback(OnHandleMessageCallback<T> onHandleMessageCallback) {
         this.onHandleMessageCallback = onHandleMessageCallback;

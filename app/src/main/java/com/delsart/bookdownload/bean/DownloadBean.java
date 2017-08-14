@@ -14,6 +14,9 @@ public class DownloadBean {
         this.url = url;
     }
 
+    public DownloadBean() {
+    }
+
     public String getType() {
         return type;
     }

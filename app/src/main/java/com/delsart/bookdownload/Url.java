@@ -12,7 +12,8 @@ public interface Url {
     String XIAOSHUWU = "http://mebook.cc/page/0?s=";
     String QISHU = "http://zhannei.baidu.com/cse/search?s=2672242722776283010&nsid=&q=";
     String AIXIA = "http://m.ixdzs.com/search?k=";
-    String BLAH ="http://blah.me/search?q=";
+    String BLAH = "http://blah.me/search?q=";
+    String DONGMANZHIJIA="http://s.acg.dmzj.com/lnovelsum/search.php?s=";
 }
 
 

@@ -5,16 +5,18 @@ android {
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.delsart.bookdownload"
-        minSdkVersion 22
+        minSdkVersion 14
         targetSdkVersion 25
-        versionCode 11
-        versionName "1.2" +
-                ""
+        versionCode 151
+        versionName "1.51"
+        resConfigs "zh"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,4 +39,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22'
     testCompile 'junit:junit:4.12'
+//    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+//    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+//    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
 }

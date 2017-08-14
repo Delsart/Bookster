@@ -5,8 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
+import android.view.View;
 import android.widget.Toast;
 
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder;
@@ -17,11 +23,14 @@ import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 import com.danielstone.materialaboutlibrary.util.ViewTypeManager;
-import com.delsart.bookdownload.R;
 import com.delsart.bookdownload.MyApplication;
+import com.delsart.bookdownload.R;
+import com.delsart.bookdownload.Url;
 import com.delsart.bookdownload.custom.MyViewTypeManager;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import java.net.URL;
 
 import moe.feng.alipay.zerosdk.AlipayZeroSdk;
 
@@ -37,18 +46,26 @@ public class AboutActivity extends MaterialAboutActivity {
     public static final int THEME_DARK_DARKBAR = 3;
     public static final int THEME_CUSTOM_CARDVIEW = 4;
 
-    protected int colorIcon = R.color.accent_material_light;
+    protected int colorIcon = R.color.DayColor;
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false)) {
+            setTheme(R.style.DarkTheme_aboutTheme);
+            colorIcon = R.color.DarkColor;
+        }
+        else
+            setTheme(R.style.aboutTheme);
+        super.onCreate(savedInstanceState);
+    }
 
 
     @NonNull
     @Override
-    protected MaterialAboutList getMaterialAboutList(final Context c) {
-        final Activity activity=this;
-        getSupportActionBar().setElevation(8);
+    protected MaterialAboutList getMaterialAboutList(@NonNull final Context c) {
+        final Activity activity = this;
         MaterialAboutCard.Builder appCardBuilder = new MaterialAboutCard.Builder();
         // Add items to card
-
         appCardBuilder.addItem(new MaterialAboutTitleItem.Builder()
                 .text(R.string.app_name)
                 .desc("© 2017 Delsart")
@@ -75,7 +92,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_history)
                         .color(ContextCompat.getColor(c, colorIcon))
                         .sizeDp(18))
-                .setOnClickAction(ConvenienceBuilder.createWebViewDialogOnClickAction(c, " ", "https://hereacg.org/bookster/changelog.html", true, false))
+                .setOnClickAction(ConvenienceBuilder.createWebViewDialogOnClickAction(c, "", "https://github.com/Delsart/Bookster/blob/master/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.txt", true, false))
                 .build());
 
 
@@ -106,6 +123,16 @@ public class AboutActivity extends MaterialAboutActivity {
                 .build());
 
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
+                .text("Fairyex")
+                .subText("空视图设计者 , 中国")
+                .icon(new IconicsDrawable(c)
+                        .icon(CommunityMaterial.Icon.cmd_account)
+                        .color(ContextCompat.getColor(c, colorIcon))
+                        .sizeDp(18))
+                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("http://www.coolapk.com/u/466253")))
+                .build());
+
+        authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text("Used-open-sources")
                 .icon(new IconicsDrawable(c)
                         .icon(CommunityMaterial.Icon.cmd_android_debug_bridge)
@@ -129,7 +156,6 @@ public class AboutActivity extends MaterialAboutActivity {
                         .sizeDp(18))
                 .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(c, Uri.parse("https://github.com/Delsart/Bookster")))
                 .build());
-
 
 
         MaterialAboutCard.Builder convenienceCardBuilder = new MaterialAboutCard.Builder();
@@ -163,7 +189,7 @@ public class AboutActivity extends MaterialAboutActivity {
                 "Question concerning MaterialAboutLibrary"));
 
         convenienceCardBuilder.addItem(new MaterialAboutActionItem.Builder()
-                .text("捐赠，请作者女装(误)喝杯果汁")
+                .text("捐赠，请作者女装(误)喝杯果汁（支付宝）")
                 .icon(new IconicsDrawable(c)
                         .icon(CommunityMaterial.Icon.cmd_coffee)
                         .color(ContextCompat.getColor(c, colorIcon))
@@ -171,19 +197,28 @@ public class AboutActivity extends MaterialAboutActivity {
                 .setOnClickAction(new MaterialAboutItemOnClickAction() {
                     @Override
                     public void onClick() {
-                        if ( AlipayZeroSdk.hasInstalledAlipayClient(MyApplication.getContext()))
-                            AlipayZeroSdk.startAlipayClient(activity,"a6x02835mi3wh18ivz0mbdb" );
+                        if (AlipayZeroSdk.hasInstalledAlipayClient(MyApplication.getContext()))
+                            AlipayZeroSdk.startAlipayClient(activity, "a6x02835mi3wh18ivz0mbdb");
                         else
-                            Toast.makeText(getApplicationContext(),"没有安装支付宝",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "没有安装支付宝", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .build());
 
-
-
-
-
-
+        convenienceCardBuilder.addItem(new MaterialAboutActionItem.Builder()
+                .text("捐赠，请作者女装(误)喝杯果汁(微信）")
+                .icon(new IconicsDrawable(c)
+                        .icon(CommunityMaterial.Icon.cmd_coffee)
+                        .color(ContextCompat.getColor(c, colorIcon))
+                        .sizeDp(18))
+                .setOnClickAction(new MaterialAboutItemOnClickAction() {
+                    @Override
+                    public void onClick() {
+                        Uri uri = Uri.parse("http://a3.qpic.cn/psb?/V10dNxbX00vsuB/eKAX6FA4sv5Y3Tnb.lrqpj6OjMWE6QuHyv2Z*h2MBtk!/b/dGoBAAAAAAAA&bo=.AJSA*gCUgMDCSw!&rf=viewer_4");
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    }
+                })
+                .build());
 
         MaterialAboutCard.Builder otherCardBuilder = new MaterialAboutCard.Builder();
         otherCardBuilder.title("来源");
@@ -228,6 +263,15 @@ public class AboutActivity extends MaterialAboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_earth)
                         .color(ContextCompat.getColor(c, colorIcon))
                         .sizeDp(18),
+                "动漫之家",
+                true,
+                Uri.parse("https://www.dmzj.com/")));
+
+        otherCardBuilder.addItem(ConvenienceBuilder.createWebsiteActionItem(c,
+                new IconicsDrawable(c)
+                        .icon(CommunityMaterial.Icon.cmd_earth)
+                        .color(ContextCompat.getColor(c, colorIcon))
+                        .sizeDp(18),
                 "360℃",
                 true,
                 Uri.parse("http://www.360dxs.com")));
@@ -255,7 +299,7 @@ public class AboutActivity extends MaterialAboutActivity {
                 "Blah",
                 true,
                 Uri.parse("http://blah.me")));
-        return new MaterialAboutList(appCardBuilder.build(), authorCardBuilder.build(), convenienceCardBuilder.build(),otherCardBuilder.build());
+        return new MaterialAboutList(appCardBuilder.build(), authorCardBuilder.build(), convenienceCardBuilder.build(), otherCardBuilder.build());
     }
 
 

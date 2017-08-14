@@ -15,7 +15,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:padding="@dimen/v16dp"
-        android:textColor="@color/White"
+        android:textColor="@color/DayBackground"
         android:textSize="18sp" />
 
     <com.delsart.bookdownload.custom.CustomTextView

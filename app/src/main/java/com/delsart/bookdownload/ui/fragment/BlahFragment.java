@@ -10,6 +10,6 @@ public class BlahFragment extends BaseFragment {
 
     @Override
     protected BaseService getService(Handler handler, String keywords) {
-        return new BlahService(handler,keywords);
+        return new BlahService(handler, keywords);
     }
 }

@@ -2,7 +2,6 @@ package com.delsart.bookdownload.service;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.delsart.bookdownload.MsgType;
 import com.delsart.bookdownload.Url;
@@ -19,13 +18,13 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class M360DService extends BaseService {
+    private static String TAG = "test";
     private final Handler mHandler;
     private int mPage;
     private String mBaseUrl;
     private CountDownLatch latch;
-    private ArrayList<DownloadBean> urls = new ArrayList<DownloadBean>();
+    private ArrayList<DownloadBean> urls = new ArrayList<>();
     private ArrayList<NovelBean> list = new ArrayList<>();
-    private static String TAG = "test";
 
     public M360DService(Handler handler, String keywords) {
         super(handler, keywords);
@@ -71,7 +70,7 @@ public class M360DService extends BaseService {
     }
 
     private void runInSameTime(final Element element) throws IOException {
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 String name = element.select("a[itemprop=name]").text();
@@ -87,7 +86,7 @@ public class M360DService extends BaseService {
                 list.add(no);
                 latch.countDown();
             }
-        }).start();
+        });
 
     }
 
@@ -95,12 +94,11 @@ public class M360DService extends BaseService {
     public ArrayList<DownloadBean> getDownloadurls(final String url) throws InterruptedException {
         latch = new CountDownLatch(1);
         final ArrayList<DownloadBean> urls = new ArrayList<>();
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                Document document = null;
                 try {
-                    document = Jsoup.connect(url)
+                    Document document = Jsoup.connect(url)
                             .timeout(10000)
                             .ignoreContentType(true)
                             .ignoreHttpErrors(true)
@@ -120,12 +118,12 @@ public class M360DService extends BaseService {
                             urls.add(new DownloadBean(elements1.get(i).text() + "：" + element.text(), element.attr("abs:href")));
                         }
                     }
-                    latch.countDown();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                latch.countDown();
             }
-        }).start();
+        });
         latch.await();
         return urls;
     }

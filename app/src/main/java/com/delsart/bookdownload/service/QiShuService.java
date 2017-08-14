@@ -15,17 +15,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class QiShuService extends BaseService {
+    private static String TAG = "test";
     private final Handler mHandler;
     private int mPage;
     private String mBaseUrl;
     private CountDownLatch latch;
     private ArrayList<NovelBean> list = new ArrayList<>();
-    private static String TAG = "test";
 
     public QiShuService(Handler handler, String keywords) {
         super(handler, keywords);
@@ -33,15 +32,13 @@ public class QiShuService extends BaseService {
         mPage = 0;
         mBaseUrl = Url.QISHU + toUtf8(keywords) + "&p=";
     }
-
+String lasts="";
     @Override
     public void get() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ArrayList<NovelBean> list2 = new ArrayList<>();
-                    list2.addAll(list);
                     list.clear();
                     Elements select = Jsoup.connect(mBaseUrl + mPage)
                             .timeout(10000)
@@ -55,50 +52,40 @@ public class QiShuService extends BaseService {
                         runInSameTime(select.get(i));
                     }
                     latch.await();
-                    if (list2.size() > 0) {
-                        if (list2.size() > 0 && list2.get(0).getShowText().equals(list.get(0).getShowText()))
-                            list.clear();
-                    }
+                    if (select.toString().equals(lasts))
+                        list.clear();
+                    lasts=select.toString();
                     mPage++;
                     Message msg = mHandler.obtainMessage();
                     msg.what = MsgType.SUCCESS;
                     msg.obj = list;
                     mHandler.sendMessage(msg);
-                } catch (SocketException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     Message msg = mHandler.obtainMessage();
                     msg.what = MsgType.ERROR;
                     mHandler.sendMessage(msg);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Message msg = mHandler.obtainMessage();
-                    msg.what = MsgType.ERROR;
-                    mHandler.sendMessage(msg);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }).start();
     }
 
     private void runInSameTime(final Element element) throws IOException {
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 String url = element.attr("abs:href");
                 if (!url.contains(".html")) {
                     latch.countDown();
                     return;
-                }
-                Document document = null;
-                try {
-                    document = Jsoup.connect(url)
-                            // .ignoreContentType(true)
+                }   try {
+                Document document = Jsoup.connect(url)
+                            .ignoreContentType(true)
                             .ignoreHttpErrors(true)
                             .get();
                     Elements a = document.select("div.detail");
                     if (a.select("li").size() < 7) {
-                        Log.d(TAG, "run: " + url);
+                        Log.d(TAG, "run:qishu错误 " + url);
                         latch.countDown();
                         return;
                     }
@@ -112,12 +99,12 @@ public class QiShuService extends BaseService {
                     String pic = a.select("img").attr("abs:src");
                     NovelBean no = new NovelBean(name, time, info, category, status, author, words, pic, url);
                     list.add(no);
-                    latch.countDown();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                latch.countDown();
             }
-        }).start();
+        });
     }
 
 
@@ -125,20 +112,17 @@ public class QiShuService extends BaseService {
     public ArrayList<DownloadBean> getDownloadurls(final String url) throws InterruptedException {
         latch = new CountDownLatch(1);
         final ArrayList<DownloadBean> urls = new ArrayList<>();
-        new Thread(new Runnable() {
+        mExecutorService.submit(new Runnable() {
             @Override
             public void run() {
-                Document document = null;
                 try {
-                    document = Jsoup.connect(url)
+                    Document document = Jsoup.connect(url)
                             .timeout(10000)
                             .ignoreContentType(true)
                             .ignoreHttpErrors(true)
                             .userAgent(Url.MOBBILE_AGENT)
                             .get();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
                 String u1 = document.select("body > div:nth-child(4) > div.show > div:nth-child(4) > div.showDown > ul > li:nth-child(1) > a").attr("abs:href");
                 String u1n = document.select("body > div:nth-child(4) > div.show > div:nth-child(4) > div.showDown > ul > li:nth-child(1) > a").text();
                 String u2 = document.select("body > div:nth-child(4) > div.show > div:nth-child(4) > div.showDown > ul > li:nth-child(2) > a").attr("abs:href");
@@ -148,9 +132,12 @@ public class QiShuService extends BaseService {
                 urls.add(new DownloadBean(u1n, u1));
                 urls.add(new DownloadBean(u2n, u2));
                 urls.add(new DownloadBean(u3n, u3));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 latch.countDown();
             }
-        }).start();
+        });
         latch.await();
         return urls;
     }
